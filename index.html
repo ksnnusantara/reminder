@@ -277,6 +277,7 @@
     border: none;
     font-size: 14px;
     white-space: nowrap;
+    position: relative;
   }
   
   .btn-primary {
@@ -361,6 +362,24 @@
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 40px;
+  }
+  
+  /* Search Box */
+  .search-box {
+    position: relative;
+    margin-bottom: 16px;
+  }
+  
+  .search-box .form-control {
+    padding-left: 40px;
+  }
+  
+  .search-box .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
   }
   
   /* Grid System */
@@ -788,6 +807,66 @@
     color: var(--muted);
   }
   
+  /* Global Loading Overlay */
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .loading-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .loading-spinner-lg {
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(255, 255, 255, 0.2);
+    border-top-color: var(--brand);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  /* Tooltip */
+  .tooltip {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: var(--ink);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+  }
+  
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+  
   /* Responsive */
   @media (max-width: 1024px) {
     .sidebar {
@@ -1006,6 +1085,10 @@
             <div class="col-span-12">
               <div class="form-group">
                 <label class="form-label">Select Employees</label>
+                <div class="search-box">
+                  <i class="fas fa-search search-icon"></i>
+                  <input type="text" class="form-control" id="search-employees" placeholder="Search employees...">
+                </div>
                 <div style="display: flex; gap: 12px; margin-bottom: 16px;">
                   <button class="btn btn-secondary btn-sm" id="btn-load-emp">
                     <i class="fas fa-users"></i> Load Employees
@@ -1071,6 +1154,10 @@
             <h3 class="card-title">Employees List</h3>
             <p class="card-subtitle">Click delete to remove</p>
           </div>
+          <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="form-control" id="search-employees-list" placeholder="Search employees...">
+          </div>
           <div class="table-container">
             <table class="table">
               <thead>
@@ -1099,6 +1186,11 @@
                 <i class="fas fa-paper-plane"></i> Send Bulk
               </button>
             </div>
+          </div>
+          
+          <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="form-control" id="search-reminders" placeholder="Search reminders...">
           </div>
           
           <div class="table-container">
@@ -1260,6 +1352,10 @@
             <div class="col-span-12">
               <div class="form-group">
                 <label class="form-label">Select Participants</label>
+                <div class="search-box">
+                  <i class="fas fa-search search-icon"></i>
+                  <input type="text" class="form-control" id="search-participants" placeholder="Search participants...">
+                </div>
                 <div style="display: flex; gap: 12px; margin-bottom: 16px;">
                   <button class="btn btn-secondary btn-sm" id="btn-load-emp-meet">
                     <i class="fas fa-users"></i> Load Employees
@@ -1287,6 +1383,11 @@
           <div class="card-header">
             <h3 class="card-title">Scheduled Meetings</h3>
             <p class="card-subtitle">List of all upcoming meetings</p>
+          </div>
+          
+          <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="form-control" id="search-meetings" placeholder="Search meetings...">
           </div>
           
           <div class="table-container">
@@ -1350,6 +1451,11 @@
           <div class="card-header">
             <h3 class="card-title">Budget List</h3>
             <p class="card-subtitle">All project budgets</p>
+          </div>
+          
+          <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="form-control" id="search-budgets" placeholder="Search budgets...">
           </div>
           
           <div class="table-container">
@@ -1454,6 +1560,10 @@
               <i class="fas fa-sync-alt"></i> Muat Ulang
             </button>
           </div>
+          <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="form-control" id="search-pengajuan" placeholder="Search project proposals...">
+          </div>
           <div class="table-container">
             <table class="table">
               <thead>
@@ -1476,6 +1586,12 @@
     </main>
   </div>
 </div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-spinner-lg"></div>
+</div>
+
 <div class="toast-container" id="toast-container"></div>
 <script>
 // ====== API BASE (paksa ke endpoint baru) ======
@@ -1613,6 +1729,15 @@ function showToast(message, type = 'success') {
     }, 300);
   }, 3000);
 }
+// Loading overlay functions
+function showLoading() {
+  document.getElementById('loading-overlay').classList.add('active');
+}
+
+function hideLoading() {
+  document.getElementById('loading-overlay').classList.remove('active');
+}
+
 // Escape HTML function
 function esc(x) {
   return (x ?? '').toString().replace(/[&<>"']/g, m => ({
@@ -1642,6 +1767,7 @@ function updateEmployeeSelection(card, isSelected) {
 // ================== Dashboard ==================
 async function loadDashboard() {
   try {
+    showLoading();
     const d = await call('getDashboardData', {});
     
     // Update KPI cards
@@ -1675,6 +1801,8 @@ async function loadDashboard() {
     });
   } catch (error) {
     showToast(error.message, 'error');
+  } finally {
+    hideLoading();
   }
 }
 document.getElementById('btn-refresh-dashboard').addEventListener('click', loadDashboard);
@@ -1684,6 +1812,7 @@ async function loadEmployees() {
   box.innerHTML = '<div class="col-span-12"><div class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Loading employees...</div></div>';
   
   try {
+    showLoading();
     const list = await call('listEmployees', {});
     
     if (!list.length) {
@@ -1728,31 +1857,64 @@ async function loadEmployees() {
     
     // Store employee data
     box.dataset.payload = JSON.stringify(list);
+    
+    // Add search functionality
+    setupEmployeeSearch();
   } catch (error) {
     box.innerHTML = `<div class="col-span-12"><div class="text-center py-4 text-danger">Error: ${error.message}</div></div>`;
+  } finally {
+    hideLoading();
   }
 }
+
+// Setup search for employees
+function setupEmployeeSearch() {
+  const searchInput = document.getElementById('search-employees');
+  if (!searchInput) return;
+  
+  searchInput.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const employeeCards = document.querySelectorAll('#employee-list .employee-card');
+    
+    employeeCards.forEach(card => {
+      const name = card.querySelector('.employee-name').textContent.toLowerCase();
+      const email = card.querySelector('.employee-email').textContent.toLowerCase();
+      const role = card.querySelector('.employee-role').textContent.toLowerCase();
+      
+      if (name.includes(searchTerm) || email.includes(searchTerm) || role.includes(searchTerm)) {
+        card.parentElement.style.display = '';
+      } else {
+        card.parentElement.style.display = 'none';
+      }
+    });
+  });
+}
+
 // Select all employees for assignment
 document.getElementById('btn-select-all-assign').addEventListener('click', () => {
-  const checkboxes = document.querySelectorAll('#employee-list input[type="checkbox"]');
+  const checkboxes = document.querySelectorAll('#employee-list input[type="checkbox"]:not(:disabled)');
   checkboxes.forEach(checkbox => {
     checkbox.checked = true;
     const card = checkbox.closest('.employee-card');
     updateEmployeeSelection(card, true);
   });
 });
+
 // Clear all selections for assignment
 document.getElementById('btn-clear-all-assign').addEventListener('click', () => {
-  const checkboxes = document.querySelectorAll('#employee-list input[type="checkbox"]');
+  const checkboxes = document.querySelectorAll('#employee-list input[type="checkbox"]:not(:disabled)');
   checkboxes.forEach(checkbox => {
     checkbox.checked = false;
     const card = checkbox.closest('.employee-card');
     updateEmployeeSelection(card, false);
   });
 });
+
 document.getElementById('btn-load-emp').addEventListener('click', loadEmployees);
+
 document.getElementById('btn-assign').addEventListener('click', async () => {
   try {
+    showLoading();
     const projectName = document.getElementById('as-project').value.trim();
     const deadline = document.getElementById('as-deadline').value;
     const priority = document.getElementById('as-priority').value;
@@ -1786,13 +1948,17 @@ document.getElementById('btn-assign').addEventListener('click', async () => {
     });
   } catch (error) {
     showToast(error.message, 'error');
+  } finally {
+    hideLoading();
   }
 });
+
 /* ================== Employees Manage ================== */
 async function loadEmployeesManage(){
   const tb = document.getElementById('tbl-emp');
   tb.innerHTML = '<tr><td colspan="6"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
   try{
+    showLoading();
     const list = await call('listEmployees', {});
     if(!list.length){
       tb.innerHTML = '<tr><td colspan="6" class="text-center py-3">No employees</td></tr>';
@@ -1831,6 +1997,7 @@ async function loadEmployeesManage(){
     tb.querySelectorAll('[data-del]').forEach(b=>{
       b.addEventListener('click', async ()=>{
         try{
+          showLoading();
           const d = JSON.parse(b.getAttribute('data-del'));
           if(!d.npk && !d.email) return showToast('NPK/Email kosong','error');
           if(!confirm('Hapus karyawan ini?')) return;
@@ -1838,15 +2005,46 @@ async function loadEmployeesManage(){
           showToast(`Deleted: ${r.deleted||0}`);
           loadEmployeesManage();
         }catch(e){ showToast(e.message, 'error'); }
+        finally {
+          hideLoading();
+        }
       });
     });
+    
+    // Setup search for employee list
+    setupEmployeeListSearch();
   }catch(e){
     tb.innerHTML = `<tr><td colspan="6" class="text-danger">Error: ${e.message}</td></tr>`;
+  } finally {
+    hideLoading();
   }
 }
+
+// Setup search for employee list
+function setupEmployeeListSearch() {
+  const searchInput = document.getElementById('search-employees-list');
+  if (!searchInput) return;
+  
+  searchInput.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#tbl-emp tr');
+    
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      if (text.includes(searchTerm)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  });
+}
+
 document.getElementById('btn-load-emp-mgr').addEventListener('click', loadEmployeesManage);
+
 document.getElementById('btn-save-emp').addEventListener('click', async ()=>{
   try{
+    showLoading();
     const npk   = document.getElementById('em-npk').value.trim();
     const nama  = document.getElementById('em-nama').value.trim();
     const email = document.getElementById('em-email').value.trim();
@@ -1858,16 +2056,22 @@ document.getElementById('btn-save-emp').addEventListener('click', async ()=>{
     document.getElementById('btn-clear-emp').click();
     loadEmployeesManage();
   }catch(e){ showToast(e.message, 'error'); }
+  finally {
+    hideLoading();
+  }
 });
+
 document.getElementById('btn-clear-emp').addEventListener('click', ()=>{
   ['em-npk','em-nama','em-email','em-divisi','em-role'].forEach(id=> document.getElementById(id).value='');
 });
+
 // ================== Reminders ==================
 async function loadReminders() {
   const tbody = document.getElementById('tbl-rem');
   tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Loading reminders...</td></tr>';
   
   try {
+    showLoading();
     const rows = await call('listReminders', {});
     
     if (!rows.length) {
@@ -1903,6 +2107,7 @@ async function loadReminders() {
     tbody.querySelectorAll('[data-send]').forEach(button => {
       button.addEventListener('click', async () => {
         try {
+          showLoading();
           const payload = JSON.parse(button.getAttribute('data-send'));
           if (!payload.email) {
             showToast('Email is empty', 'error');
@@ -1913,6 +2118,8 @@ async function loadReminders() {
           showToast('Reminder sent successfully');
         } catch (error) {
           showToast(error.message, 'error');
+        } finally {
+          hideLoading();
         }
       });
     });
@@ -1921,6 +2128,7 @@ async function loadReminders() {
     tbody.querySelectorAll('[data-del-proj]').forEach(btn=>{
       btn.addEventListener('click', async ()=>{
         try{
+          showLoading();
           const p = JSON.parse(btn.getAttribute('data-del-proj'));
           if(!p.project) return showToast('Project kosong', 'error');
           if(!confirm(`Hapus assignment project "${p.project}" untuk orang ini?`)) return;
@@ -1929,24 +2137,59 @@ async function loadReminders() {
           loadReminders();
           loadDashboard();
         }catch(e){ showToast(e.message, 'error'); }
+        finally {
+          hideLoading();
+        }
       });
     });
+    
+    // Setup search for reminders
+    setupRemindersSearch();
   } catch (error) {
     tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-danger">Error: ${error.message}</td></tr>`;
+  } finally {
+    hideLoading();
   }
 }
+
+// Setup search for reminders
+function setupRemindersSearch() {
+  const searchInput = document.getElementById('search-reminders');
+  if (!searchInput) return;
+  
+  searchInput.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#tbl-rem tr');
+    
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      if (text.includes(searchTerm)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  });
+}
+
 document.getElementById('btn-load-rem').addEventListener('click', loadReminders);
+
 document.getElementById('btn-send-bulk').addEventListener('click', async () => {
   try {
+    showLoading();
     const result = await call('sendBulkReminders', {});
     showToast(`Bulk reminders sent: ${result.sent || 0}`);
   } catch (error) {
     showToast(error.message, 'error');
+  } finally {
+    hideLoading();
   }
 });
+
 // New function to load dropdowns for Update Progress
 async function loadUpdateProgressDropdowns() {
     try {
+        showLoading();
         const reminders = await call('listReminders', {});
         
         const employeeSelect = document.getElementById('up-employee');
@@ -1978,11 +2221,14 @@ async function loadUpdateProgressDropdowns() {
         });
     } catch (e) {
         showToast('Failed to load employee/project lists.', 'error');
+    } finally {
+        hideLoading();
     }
 }
 
 document.getElementById('btn-update-progress').addEventListener('click', async () => {
   try {
+    showLoading();
     const employee = document.getElementById('up-employee').value;
     const project = document.getElementById('up-project').value;
     const progress = Number(document.getElementById('up-progress').value || 0);
@@ -2009,11 +2255,15 @@ document.getElementById('btn-update-progress').addEventListener('click', async (
     loadKanban();
   } catch (error) {
     showToast(error.message, 'error');
+  } finally {
+    hideLoading();
   }
 });
+
 // ================== Schedule ==================
 document.getElementById('btn-save-schedule').addEventListener('click', async () => {
   try {
+    showLoading();
     const hour = Number(document.getElementById('sc-hour').value || 8);
     const weekend = document.getElementById('sc-weekend').value === 'true';
     
@@ -2021,18 +2271,25 @@ document.getElementById('btn-save-schedule').addEventListener('click', async () 
     showToast('Schedule saved and trigger created');
   } catch (error) {
     showToast(error.message, 'error');
+  } finally {
+    hideLoading();
   }
 });
+
 document.getElementById('btn-load-schedule').addEventListener('click', async () => {
   try {
+    showLoading();
     const config = await call('getSchedule', {});
     document.getElementById('sc-hour').value = config.hour ?? 8;
     document.getElementById('sc-weekend').value = String(!!config.weekend);
     showToast('Schedule loaded');
   } catch (error) {
     showToast(error.message, 'error');
+  } finally {
+    hideLoading();
   }
 });
+
 // ================== Meetings ==================
 // Load employees for meeting participants
 async function loadEmployeesForMeeting() {
@@ -2040,6 +2297,7 @@ async function loadEmployeesForMeeting() {
   box.innerHTML = '<div class="col-span-12"><div class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Loading employees...</div></div>';
   
   try {
+    showLoading();
     const list = await call('listEmployees', {});
     
     if (!list.length) {
@@ -2084,29 +2342,61 @@ async function loadEmployeesForMeeting() {
     
     // Store employee data
     box.dataset.payload = JSON.stringify(list);
+    
+    // Setup search for participants
+    setupParticipantsSearch();
   } catch (error) {
     box.innerHTML = `<div class="col-span-12"><div class="text-center py-4 text-danger">Error: ${error.message}</div></div>`;
+  } finally {
+    hideLoading();
   }
 }
+
+// Setup search for participants
+function setupParticipantsSearch() {
+  const searchInput = document.getElementById('search-participants');
+  if (!searchInput) return;
+  
+  searchInput.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const employeeCards = document.querySelectorAll('#employee-list-meet .employee-card');
+    
+    employeeCards.forEach(card => {
+      const name = card.querySelector('.employee-name').textContent.toLowerCase();
+      const email = card.querySelector('.employee-email').textContent.toLowerCase();
+      const role = card.querySelector('.employee-role').textContent.toLowerCase();
+      
+      if (name.includes(searchTerm) || email.includes(searchTerm) || role.includes(searchTerm)) {
+        card.parentElement.style.display = '';
+      } else {
+        card.parentElement.style.display = 'none';
+      }
+    });
+  });
+}
+
 // Select all employees for meeting
 document.getElementById('btn-select-all-meet').addEventListener('click', () => {
-  const checkboxes = document.querySelectorAll('#employee-list-meet input[type="checkbox"]');
+  const checkboxes = document.querySelectorAll('#employee-list-meet input[type="checkbox"]:not(:disabled)');
   checkboxes.forEach(checkbox => {
     checkbox.checked = true;
     const card = checkbox.closest('.employee-card');
     updateEmployeeSelection(card, true);
   });
 });
+
 // Clear all selections for meeting
 document.getElementById('btn-clear-all-meet').addEventListener('click', () => {
-  const checkboxes = document.querySelectorAll('#employee-list-meet input[type="checkbox"]');
+  const checkboxes = document.querySelectorAll('#employee-list-meet input[type="checkbox"]:not(:disabled)');
   checkboxes.forEach(checkbox => {
     checkbox.checked = false;
     const card = checkbox.closest('.employee-card');
     updateEmployeeSelection(card, false);
   });
 });
+
 document.getElementById('btn-load-emp-meet').addEventListener('click', loadEmployeesForMeeting);
+
 // Get selected participants
 function getSelectedParticipants() {
   const checkboxes = document.querySelectorAll('#employee-list-meet input[type="checkbox"]:checked');
@@ -2115,8 +2405,10 @@ function getSelectedParticipants() {
     NAMA: cb.dataset.name
   }));
 }
+
 document.getElementById('btn-add-meet').addEventListener('click', async () => {
   try {
+    showLoading();
     const title = document.getElementById('m-title').value.trim();
     const dateTime = document.getElementById('m-dt').value;
     const duration = Number(document.getElementById('m-dur').value || 60);
@@ -2162,13 +2454,17 @@ document.getElementById('btn-add-meet').addEventListener('click', async () => {
     });
   } catch (error) {
     showToast(error.message, 'error');
+  } finally {
+    hideLoading();
   }
 });
+
 async function loadMeetings() {
   const tbody = document.getElementById('tbl-meet');
   tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Loading meetings...</td></tr>';
   
   try {
+    showLoading();
     const rows = await call('listMeetings', {});
     
     if (!rows.length) {
@@ -2189,17 +2485,45 @@ async function loadMeetings() {
         </td>
       </tr>
     `).join('');
+    
+    // Setup search for meetings
+    setupMeetingsSearch();
   } catch (error) {
     tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-danger">Error: ${error.message}</td></tr>`;
+  } finally {
+    hideLoading();
   }
 }
+
+// Setup search for meetings
+function setupMeetingsSearch() {
+  const searchInput = document.getElementById('search-meetings');
+  if (!searchInput) return;
+  
+  searchInput.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#tbl-meet tr');
+    
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      if (text.includes(searchTerm)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  });
+}
+
 document.getElementById('btn-load-meet').addEventListener('click', loadMeetings);
+
 // ================== Budget ==================
 async function loadApprovedBudgets() {
     const tbody = document.getElementById('tbl-budget');
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="5"><i class="fas fa-spinner fa-spin"></i> Memuat...</td></tr>';
     try {
+      showLoading();
       // Manager otomatis bisa lihat semua
       const [budgets, expenses] = await Promise.all([
         call('getBudget', {}),     // { ID, Project, Amount, Period }
@@ -2243,12 +2567,39 @@ async function loadApprovedBudgets() {
           </tr>
         `;
       }).join('');
+      
+      // Setup search for budgets
+      setupBudgetsSearch();
     } catch (e) {
       tbody.innerHTML = '<tr><td colspan="5" style="padding:16px; color:var(--danger)">Gagal memuat budget</td></tr>';
       showToast(e.message || 'Gagal memuat budget', 'error');
+    } finally {
+      hideLoading();
     }
 }
+
+// Setup search for budgets
+function setupBudgetsSearch() {
+  const searchInput = document.getElementById('search-budgets');
+  if (!searchInput) return;
+  
+  searchInput.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#tbl-budget tr');
+    
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      if (text.includes(searchTerm)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  });
+}
+
 document.getElementById('btn-load-budget')?.addEventListener('click', loadApprovedBudgets);
+
 // ================== Kanban ==================
 // ---- KANBAN: build otomatis dari listReminders ----
 function groupByProjectAverage(reminders){
@@ -2280,6 +2631,7 @@ function groupByProjectAverage(reminders){
     };
   });
 }
+
 function renderKanbanColumns(items){
   // reset
   const elTodo = document.getElementById('k-todo');
@@ -2317,8 +2669,10 @@ function renderKanbanColumns(items){
   document.getElementById('k-doing-count').textContent = doing.length;
   document.getElementById('k-done-count').textContent  = done.length;
 }
+
 async function loadKanban(){
   try{
+    showLoading();
     const filter = (document.getElementById('kanban-employee')?.value || '').toLowerCase();
     const items = await call('listReminders', {});
     
@@ -2332,12 +2686,17 @@ async function loadKanban(){
       const box=document.getElementById(id);
       if(box) box.innerHTML = `<div style="padding:12px;color:var(--danger)">Error: ${e.message}</div>`;
     });
+  } finally {
+    hideLoading();
   }
 }
+
 document.getElementById('btn-load-kanban')?.addEventListener('click', loadKanban);
 document.getElementById('kanban-employee')?.addEventListener('change', loadKanban);
+
 async function loadEmployeesForKanban() {
   try {
+    showLoading();
     const res = await call('listEmployees', {});
     const sel = document.getElementById('kanban-employee');
     if (!sel) return;
@@ -2354,35 +2713,51 @@ async function loadEmployeesForKanban() {
     if (selected) sel.value = selected;
   } catch(e){
     // ignore
+  } finally {
+    hideLoading();
   }
 }
+
 document.querySelector('[data-section="kanban"]')?.addEventListener('click', () => {
-  setTimeout(async () => { await loadEmployeesForKanban(); await loadKanban(); }, 50);
+  setTimeout(async () => { 
+    await loadEmployeesForKanban(); 
+    await loadKanban(); 
+  }, 50);
 });
+
 // ================== Notes ==================
 document.getElementById('btn-load-notes').addEventListener('click', async () => {
   try {
+    showLoading();
     const data = await call('getNotes', {});
     document.getElementById('notes-area').value = data.text || '';
     showToast('Notes loaded successfully');
   } catch (error) {
     showToast(error.message, 'error');
+  } finally {
+    hideLoading();
   }
 });
+
 document.getElementById('btn-save-notes').addEventListener('click', async () => {
   try {
+    showLoading();
     const text = document.getElementById('notes-area').value;
     await call('saveNotes', { text });
     showToast('Notes saved successfully');
   } catch (error) {
     showToast(error.message, 'error');
+  } finally {
+    hideLoading();
   }
 });
+
 // ================== Pengajuan ==================
 async function loadPengajuan(){
   const tbody = document.getElementById('tbl-pengajuan');
   tbody.innerHTML='<tr><td colspan="6">Loading...</td></tr>';
   try {
+    showLoading();
     const rows = await call('listPengajuan', {});
     if(!rows.length){
       tbody.innerHTML='<tr><td colspan="6" style="color:var(--muted)">Belum ada pengajuan</td></tr>';
@@ -2403,26 +2778,60 @@ async function loadPengajuan(){
         </tr>
       `;
     }).join('');
+    
+    // Setup search for pengajuan
+    setupPengajuanSearch();
   } catch(e){
     showToast(e.message,'error');
+  } finally {
+    hideLoading();
   }
 }
+
+// Setup search for pengajuan
+function setupPengajuanSearch() {
+  const searchInput = document.getElementById('search-pengajuan');
+  if (!searchInput) return;
+  
+  searchInput.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#tbl-pengajuan tr');
+    
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      if (text.includes(searchTerm)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  });
+}
+
 function renderStatusPill(s) {
   const up = String(s||'MENUNGGU').toUpperCase();
   if (up === 'SETUJU') return '<span class="status-pill ok"><span class="status-dot"></span> SETUJU</span>';
   if (up === 'TOLAK')  return '<span class="status-pill danger"><span class="status-dot"></span> TOLAK</span>';
   return '<span class="status-pill warn"><span class="status-dot"></span> MENUNGGU</span>';
 }
+
 async function setStatus(id,status){
   try {
+    showLoading();
     await call('updatePengajuan',{id,status});
     showToast('Status diperbarui');
     loadPengajuan();
   } catch(e){ showToast(e.message, 'error'); }
+  finally {
+    hideLoading();
+  }
 }
+
 document.getElementById('btn-refresh-pengajuan').addEventListener('click', loadPengajuan);
+
 // Initialize the app
 loadDashboard();
+
 // Fungsi untuk logout
 function doLogout() {
   // Hapus data autentikasi dari localStorage
@@ -2430,6 +2839,7 @@ function doLogout() {
   // Arahkan ke halaman login
   window.location.href = 'login.html';
 }
+
 // Tambahkan event listener untuk tombol logout
 document.addEventListener("DOMContentLoaded", () => {
   const logoutBtn = document.getElementById("btn-logout");
@@ -2437,8 +2847,7 @@ document.addEventListener("DOMContentLoaded", () => {
     logoutBtn.addEventListener("click", doLogout);
   }
 });
-</script>
-<script>
+
 document.addEventListener("DOMContentLoaded", ()=>{
   requireAuth("manager", ({user})=>{
     const nameEl = document.getElementById("user-name");
@@ -2447,12 +2856,12 @@ document.addEventListener("DOMContentLoaded", ()=>{
   const out = document.getElementById("btn-logout");
   if (out) out.addEventListener("click", doLogout);
 });
-</script>
-<script>
+
 // Format Rupiah helper
 function fmtRupiah(num) {
   return Number(num).toLocaleString('id-ID');
 }
+
 // Format Date helper
 function fmtDateISO(date) {
   if (!date) return '';
