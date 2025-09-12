@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Halaman Login Reminder KSN - Sistem Manajemen Tugas" />
+  <meta name="author" content="KSN Team" />
+  <title>Login – REMINDER KSN</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  
+  <style>
+    :root{ 
+      --accent:#d4af37; /* Warna emas utama */
+      --accent-light:#f0d78c; /* Warna emas terang */
+      --accent-dark:#b8941f; /* Warna emas gelap */
+      --primary:#d4af37;
+      --ink:#0f172a;
+      --ink-muted:#64748b;
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --line:#e5e7eb;
+      --success:#10b981;
+      --danger:#ef4444;
+      --info:#3b82f6;
+      --gold-gradient: linear-gradient(45deg, #d4af37, #f0d78c, #d4af37); /* Gradien emas */
+      --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body{
+      min-height:100vh;
+      background: linear-gradient(135deg, #f9f7f2, #f5f1e6); /* Latar belakang krem lembut */
+      color:var(--ink);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 16px;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    .container-wrapper {
+      display: flex;
+      justify-content: center;
+      padding: 2rem 0;
+      min-height: 100vh;
+      width: 100%;
+    }
+    
+    .cardx{
+      width:min(96vw,460px);
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      box-shadow:var(--shadow-xl);
+      overflow: hidden;
+      transition: transform .3s ease, box-shadow .3s ease;
+      animation: fadeIn .6s ease;
+      position: relative;
+      margin: 0 auto;
+      align-self: flex-start;
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      border-top: 4px solid var(--accent); /* Garis emas di bagian atas */
+    }
+    
+    .cardx:hover { 
+      transform: translateY(-5px); 
+      box-shadow:var(--shadow-xl);
+      border-color: var(--accent-light);
+    }
+    
+    .btn-brand{ 
+      background:var(--accent); 
+      border-color:var(--accent); 
+      color:#ffffff; 
+      font-weight:600; 
+      transition: all .25s ease;
+      border-radius: 8px;
+      padding: 12px 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-brand:hover{ 
+      filter:brightness(1.1); 
+      color:#ffffff; 
+      transform: translateY(-2px); 
+      box-shadow: var(--shadow-md);
+      background-color: var(--accent-dark);
+      border-color: var(--accent-dark);
+    }
+    
+    .btn-brand:active { 
+      transform: translateY(0); 
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .form-control{ 
+      background:#fff; 
+      color:var(--ink); 
+      border-color:var(--line); 
+      transition: all .2s ease; 
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 1rem;
+    }
+    
+    .form-control:focus{ 
+      border-color:var(--accent); 
+      box-shadow:0 0 0 .2rem rgba(212, 175, 55, .18); /* Fokus emas */
+      background-color: #fff;
+    }
+    
+    .muted{ color:var(--ink-muted); }
+    a.link{ color:var(--accent); text-decoration:none; transition:all .2s ease; font-weight:500; } 
+    a.link:hover{ text-decoration:underline; opacity:.85; color:var(--accent-dark); }
+    
+    .input-group .btn-outline-secondary { 
+      border-color: var(--line); 
+      background: #fafafa; 
+      color: var(--ink-muted); 
+      border-radius: 0 8px 8px 0;
+    }
+    
+    .input-group .btn-outline-secondary:hover { 
+      background: #f3f4f6; 
+      color: var(--ink); 
+      border-color: var(--accent);
+    }
+    
+    .form-check-input:checked { background-color: var(--accent); border-color: var(--accent); }
+    
+    .alert { 
+      border-radius: 8px; 
+      border: none;
+      padding: 14px 18px;
+      font-size: 0.95rem;
+    }
+    
+    .modal-content { 
+      background:#ffffff; 
+      color:var(--ink); 
+      border: 1px solid var(--line); 
+      border-radius: 12px; 
+    }
+    
+    .modal-header { 
+      border-bottom: 1px solid var(--line); 
+    }
+    
+    .modal-footer { 
+      border-top: 1px solid var(--line); 
+    }
+    
+    .form-label { 
+      font-weight: 600; 
+      margin-bottom: .5rem; 
+      color: var(--ink);
+      font-size: 0.95rem;
+    }
+    
+    .display-6 { 
+      font-size: 2.5rem; 
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    
+    .text-center .fw-bold { 
+      font-size: 1.75rem; 
+      margin-bottom: .25rem;
+      color: var(--ink);
+    }
+    
+    .spinner-border { 
+      width: 1.2rem; 
+      height: 1.2rem;
+      border-width: 0.2em;
+    }
+    
+    .token-input { 
+      font-family: monospace; 
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    
+    .password-strength { 
+      height: 6px; 
+      border-radius: 5px; 
+      margin-top: 10px; 
+      transition: all .3s ease; 
+      background:#e5e7eb;
+    }
+    
+    .strength-weak   { 
+      background-color: var(--danger);  
+      width: 33%; 
+    }
+    
+    .strength-medium { 
+      background-color: var(--accent);  
+      width: 66%; 
+    }
+    
+    .strength-strong { 
+      background-color: var(--success); 
+      width: 100%; 
+    }
+    
+    .form-step { 
+      display: none; 
+      animation: fadeIn .4s ease;
+    }
+    
+    .form-step.active { 
+      display: block; 
+    }
+    
+    .step-indicator { 
+      display: flex; 
+      justify-content: space-between; 
+      margin-bottom: 1.5rem; 
+      position: relative;
+    }
+    
+    .step-indicator::before {
+      content: "";
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      right: 15px;
+      height: 2px;
+      background-color: #e5e7eb;
+      z-index: 1;
+    }
+    
+    .step { 
+      flex:1; 
+      text-align:center; 
+      position:relative; 
+      z-index: 2;
+    }
+    
+    .step-circle{ 
+      width:32px; 
+      height:32px; 
+      border-radius:50%; 
+      background-color:#e5e7eb; 
+      color:#6b7280; 
+      display:flex; 
+      align-items:center; 
+      justify-content:center; 
+      margin:0 auto 8px; 
+      font-weight:700;
+      transition: all .3s ease;
+    }
+    
+    .step.active .step-circle{ 
+      background-color:var(--accent); 
+      color:#ffffff;
+      transform: scale(1.1);
+      box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+    }
+    
+    .step.completed .step-circle{ 
+      background-color:var(--success); 
+      color:#fff;
+    }
+    
+    .step-title{ 
+      font-size:.75rem; 
+      color:var(--ink-muted); 
+      font-weight: 500;
+    }
+    
+    .step.active .step-title{ 
+      color:var(--ink); 
+      font-weight:600;
+    }
+    
+    .invalid-feedback {
+      font-size: 0.8rem;
+      margin-top: 0.4rem;
+    }
+    
+    .text-danger {
+      color: var(--danger) !important;
+    }
+    
+    .text-success {
+      color: var(--success) !important;
+    }
+    
+    .text-primary {
+      color: var(--primary) !important;
+    }
+    
+    .btn-outline-secondary {
+      border-radius: 8px;
+      font-weight: 500;
+      padding: 10px 16px;
+    }
+    
+    .btn-outline-secondary:hover {
+      background-color: rgba(212, 175, 55, 0.05);
+    }
+    
+    @keyframes fadeIn { 
+      from { 
+        opacity:0; 
+        transform: translateY(20px);
+      } to { 
+        opacity:1; 
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    /* Animasi untuk notifikasi */
+    @keyframes slideIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .notification {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    /* Logo di tengah */
+    .logo-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .logo-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: var(--shadow-md);
+      border: 3px solid var(--accent-light);
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .logo-icon:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--accent);
+    }
+    
+    .logo-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    
+    /* Efek glassmorphism untuk card */
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Custom input group styling */
+    .input-group {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .input-group .form-control {
+      border-right: none;
+    }
+    
+    .input-group .form-control:focus {
+      border-right: none;
+    }
+    
+    .input-group .btn {
+      border-left: none;
+    }
+    
+    /* Loading overlay */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .loading-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(212, 175, 55, 0.2);
+      border-radius: 50%;
+      border-top-color: var(--accent);
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Custom checkbox */
+    .form-check-input {
+      width: 1.2em;
+      height: 1.2em;
+      margin-top: 0.3em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .form-check-input:focus {
+      box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25);
+      border-color: var(--accent);
+    }
+    
+    /* Custom alert styling */
+    .alert-warning {
+      background-color: rgba(251, 191, 36, 0.1);
+      color: #92400e;
+      border-left: 4px solid var(--accent);
+    }
+    
+    /* Media queries */
+    @media (max-width: 576px) {
+      .cardx{ 
+        border-radius:12px; 
+        padding:1.25rem !important; 
+      }
+      
+      .display-6{ 
+        font-size:2rem; 
+      }
+      
+      .text-center .fw-bold{ 
+        font-size:1.5rem; 
+      }
+      
+      .step-title{ 
+        font-size:.68rem; 
+      }
+      
+      .step-indicator::before {
+        left: 10px;
+        right: 10px;
+      }
+      
+      .logo-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 20px;
+      }
+    }
+    
+    /* Tambahkan media query untuk layar yang lebih tinggi */
+    @media (min-height: 700px) {
+      .container-wrapper {
+        align-items: center;
+      }
+      
+      .cardx {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+    }
+    
+    /* Animasi untuk form transition */
+    .form-transition {
+      transition: all 0.3s ease;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent-light);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+  
+  <div class="container-wrapper">
+    <div class="cardx p-4 p-md-5 glass-effect">
+      <div class="text-center mb-4">
+        <!-- Logo di tengah menggantikan ikon bell -->
+        <div class="logo-container">
+          <div class="logo-icon">
+            <img src="logo.jpg" alt="Logo KSN" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <i class="fas fa-gem" style="display:none;"></i>
+          </div>
+        </div>
+        <div class="fw-bold">REMINDER KSN</div>
+        <div class="muted small mt-2" id="authSubtitle">Masuk untuk melanjutkan</div>
+      </div>
+      
+      <!-- ===== LOGIN ===== -->
+      <div id="loginView" class="form-step active form-transition">
+        <form id="formLogin" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <label class="form-label" for="loginEmail">
+              <i class="fa-regular fa-envelope me-2"></i>Email
+            </label>
+            <input id="loginEmail" class="form-control" type="email" required placeholder="nama@perusahaan.com" autocomplete="email" aria-required="true">
+            <div class="invalid-feedback">Silakan masukkan email yang valid.</div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label" for="loginPassword">
+              <i class="fa-solid fa-lock me-2"></i>Password
+            </label>
+            <div class="input-group">
+              <input id="loginPassword" class="form-control" type="password" required placeholder="••••••••" autocomplete="current-password" aria-required="true">
+              <button type="button" class="btn btn-outline-secondary" id="togglePwd" title="Lihat password" aria-label="Toggle password visibility">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+              <div class="invalid-feedback">Silakan masukkan password.</div>
+            </div>
+          </div>
+          
+          <div id="loginError" class="alert alert-danger notification" role="alert" style="display:none;"></div>
+          
+          <button id="btnLogin" class="btn btn-brand w-100 mb-3" type="submit">
+            <span class="spinner-border spinner-border-sm me-2" id="spinLogin" style="display:none;"></span>
+            <span id="loginBtnText">Masuk</span>
+          </button>
+          
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="rememberCheck" checked>
+              <label class="form-check-label muted" for="rememberCheck">Tetap masuk</label>
+            </div>
+            <a class="small link" href="#" id="lnkForgot">Lupa password?</a>
+          </div>
+        </form>
+      </div>
+      
+      <!-- ===== RESET PASSWORD ===== -->
+      <div id="resetView" class="form-step form-transition">
+        <div class="step-indicator mb-3">
+          <div class="step active" id="step1">
+            <div class="step-circle">1</div>
+            <div class="step-title">Request Token</div>
+          </div>
+          <div class="step" id="step2">
+            <div class="step-circle">2</div>
+            <div class="step-title">Reset Password</div>
+          </div>
+        </div>
+        
+        <!-- Step 1: request token -->
+        <div id="requestTokenStep" class="reset-step active">
+          <div class="alert alert-warning py-2 mb-3">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+            <strong>Reset Password</strong> — Masukkan email terdaftar Anda untuk menerima token reset.
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label" for="resetEmail">
+              <i class="fa-regular fa-envelope me-2"></i>Email Terdaftar
+            </label>
+            <input id="resetEmail" type="email" class="form-control" placeholder="nama@perusahaan.com" required aria-required="true">
+            <div class="invalid-feedback">Silakan masukkan email yang valid.</div>
+          </div>
+          
+          <div id="requestError" class="alert alert-danger notification" role="alert" style="display:none;"></div>
+          <div id="requestSuccess" class="alert alert-success notification" role="alert" style="display:none;"></div>
+          
+          <div class="d-flex gap-2">
+            <button id="btnBackToLogin" class="btn btn-outline-secondary" type="button">
+              <i class="fa-solid fa-arrow-left me-1"></i>Kembali
+            </button>
+            <button id="btnRequestToken" class="btn btn-brand flex-grow-1" type="button">
+              <span class="spinner-border spinner-border-sm me-2" id="spinRequest" style="display:none;"></span>
+              <span id="requestBtnText">Kirim Token</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Step 2: verify + reset -->
+        <form id="formReset" class="reset-step needs-validation" style="display:none;" novalidate>
+          <div class="alert alert-warning py-2 mb-3">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+            <strong>Reset Password</strong> — Masukkan token dari email dan password baru Anda.
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label" for="resetToken">
+              <i class="fa-solid fa-key me-2"></i>Token Reset
+            </label>
+            <div class="input-group">
+              <input id="resetToken" type="text" class="form-control token-input" placeholder="RST_..." required aria-required="true">
+              <button type="button" class="btn btn-outline-secondary" id="btnCheckToken" title="Verifikasi token">
+                <i class="fa-solid fa-check"></i>
+              </button>
+            </div>
+            <div class="invalid-feedback">Token reset diperlukan.</div>
+            <div id="tokenStatus" class="small mt-1"></div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label" for="newPwd1">
+              <i class="fa-solid fa-lock me-2"></i>Password Baru
+            </label>
+            <input id="newPwd1" type="password" class="form-control" required minlength="6" autocomplete="new-password" aria-required="true">
+            <div class="password-strength" id="passwordStrength"></div>
+            <div class="invalid-feedback">Password minimal 6 karakter.</div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label" for="newPwd2">
+              <i class="fa-solid fa-lock me-2"></i>Ulangi Password Baru
+            </label>
+            <input id="newPwd2" type="password" class="form-control" required autocomplete="new-password" aria-required="true">
+            <div class="invalid-feedback">Password tidak cocok.</div>
+          </div>
+          
+          <div id="resetError" class="alert alert-danger notification" role="alert" style="display:none;"></div>
+          <div id="resetSuccess" class="alert alert-success notification" role="alert" style="display:none;"></div>
+          
+          <div class="d-flex gap-2">
+            <button id="btnBackToToken" class="btn btn-outline-secondary" type="button">
+              <i class="fa-solid fa-arrow-left me-1"></i>Kembali
+            </button>
+            <button id="btnReset" class="btn btn-brand flex-grow-1" type="submit">
+              <span class="spinner-border spinner-border-sm me-2" id="spinReset" style="display:none;"></span>
+              <span id="resetBtnText">Reset Password</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Footer -->
+  <footer class="text-center text-muted py-4 mt-5">
+    <p class="mb-0">&copy; 2023 KSN Reminder. Hak Cipta Dilindungi.</p>
+    <p class="small">Dibuat dengan <i class="fas fa-heart text-danger"></i> oleh Tim KSN</p>
+  </footer>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    /* ===== KONFIG =====
+       Ganti dengan URL Apps Script Anda jika perlu */
+    const API_URL = "https://script.google.com/macros/s/AKfycbwVgPZ9TnMDG-5h3vUy8e8YG-n9cTT2U73PNdzOXjPLWQRVeoiljRWSGx3nheMDuV33Sw/exec";
+    const KEY_TOKEN = "prs_token";
+    const KEY_USER  = "prs_user";
+    const MANAGER_ROLES = ["manager","admin","owner","supervisor","lead"];
+    
+    /* ===== UTIL ===== */
+    const $ = s => document.querySelector(s);
+    const isManager = r => MANAGER_ROLES.includes(String(r?.role||"").toLowerCase());
+    
+    // Show loading overlay
+    function showLoading() {
+      $('#loadingOverlay').classList.add('active');
+    }
+    
+    // Hide loading overlay
+    function hideLoading() {
+      $('#loadingOverlay').classList.remove('active');
+    }
+    
+    function api(fn, data){
+      return fetch(API_URL, {
+        method: "POST",
+        body: new URLSearchParams({ function: fn, data: JSON.stringify(data||{}) })
+      }).then(r=>r.json());
+    }
+    
+    function saveSession(token, user, remember){
+      const store = remember ? localStorage : sessionStorage;
+      store.setItem(KEY_TOKEN, token);
+      store.setItem(KEY_USER, JSON.stringify(user||{}));
+    }
+    
+    function readAnySession(){
+      const t = localStorage.getItem(KEY_TOKEN) || sessionStorage.getItem(KEY_TOKEN) || "";
+      const u = localStorage.getItem(KEY_USER)  || sessionStorage.getItem(KEY_USER)  || "{}";
+      try{ return { token:t, user: JSON.parse(u) }; }catch(e){ return { token:t, user:{} }; }
+    }
+    
+    function getParam(name){ 
+      const url = new URL(location.href); 
+      return url.searchParams.get(name); 
+    }
+    
+    /* ===== View Switcher ===== */
+    function showLoginForm(showing) {
+      const loginView = $("#loginView");
+      const resetView = $("#resetView");
+      
+      if (showing) {
+        loginView.classList.add("active");
+        resetView.classList.remove("active");
+        $("#authSubtitle").textContent = "Masuk untuk melanjutkan";
+      } else {
+        loginView.classList.remove("active");
+        resetView.classList.add("active");
+        $("#authSubtitle").textContent = "Reset password Anda";
+      }
+    }
+    
+    function showStep(stepNumber) {
+      document.querySelectorAll('.step').forEach((step, index) => {
+        if (index < stepNumber - 1) { 
+          step.classList.add('completed'); 
+          step.classList.remove('active'); 
+        }
+        else if (index === stepNumber - 1) { 
+          step.classList.add('active'); 
+          step.classList.remove('completed'); 
+        }
+        else { 
+          step.classList.remove('active','completed'); 
+        }
+      });
+      
+      if (stepNumber === 1) { 
+        $("#requestTokenStep").style.display = "block"; 
+        $("#formReset").style.display = "none"; 
+      }
+      else { 
+        $("#requestTokenStep").style.display = "none"; 
+        $("#formReset").style.display = "block"; 
+      }
+    }
+    
+    function resetResetForm() {
+      $("#resetEmail").value = "";
+      $("#resetToken").value = "";
+      $("#newPwd1").value = "";
+      $("#newPwd2").value = "";
+      ["requestError","requestSuccess","resetError","resetSuccess"].forEach(id=>{
+        $("#"+id).style.display="none";
+      });
+      $("#tokenStatus").textContent = "";
+      const strengthEl = $("#passwordStrength");
+      strengthEl.className = "password-strength"; 
+      strengthEl.style.width = "0";
+      $("#formReset").classList.remove("was-validated");
+      showStep(1);
+    }
+    
+    /* ===== INIT: jika ada ?reset_token=... tampilkan Step 2 ===== */
+    (function initResetFromQuery(){
+      const resetToken = getParam('reset_token');
+      if (resetToken) {
+        showLoginForm(false);
+        showStep(2);
+        $("#resetToken").value = resetToken;
+        verifyToken(resetToken);
+      }
+    })();
+    
+    /* ===== UI Behaviors ===== */
+    $("#togglePwd").addEventListener("click", ()=>{
+      const i = $("#loginPassword");
+      const isPwd = i.type === "password";
+      i.type = isPwd ? "text" : "password";
+      $("#togglePwd").innerHTML = isPwd ? 
+        '<i class="fa-regular fa-eye-slash"></i>' : 
+        '<i class="fa-regular fa-eye"></i>';
+    });
+    
+    $("#newPwd1").addEventListener("input", function() {
+      const password = this.value;
+      const el = $("#passwordStrength");
+      el.className = "password-strength";
+      
+      if (!password) { 
+        el.style.width = "0"; 
+        return; 
+      }
+      
+      let strength = 0;
+      if (password.length >= 6) strength++;
+      if (password.length >= 10) strength++;
+      if (/[A-Z]/.test(password) && /[a-z]/.test(password)) strength++;
+      if (/[0-9]/.test(password)) strength++;
+      if (/[^A-Za-z0-9]/.test(password)) strength++;
+      
+      if (strength <= 2)      el.classList.add("strength-weak");
+      else if (strength <= 3) el.classList.add("strength-medium");
+      else                    el.classList.add("strength-strong");
+    });
+    
+    $("#newPwd2").addEventListener("input", ()=>{
+      const p1 = $("#newPwd1").value.trim();
+      const p2 = $("#newPwd2").value.trim();
+      
+      if (p2 && p1 !== p2) {
+        $("#newPwd2").classList.add('is-invalid');
+      } else {
+        $("#newPwd2").classList.remove('is-invalid');
+      }
+    });
+    
+    /* ===== Navigation Buttons ===== */
+    $("#lnkForgot").addEventListener("click", (e) => { 
+      e.preventDefault(); 
+      showLoginForm(false); 
+      resetResetForm(); 
+    });
+    
+    $("#btnBackToLogin").addEventListener("click", () => { 
+      showLoginForm(true); 
+    });
+    
+    $("#btnBackToToken").addEventListener("click", () => { 
+      showStep(1); 
+    });
+    
+    /* ===== Token Verification ===== */
+    async function verifyToken(token) {
+      const statusEl = $("#tokenStatus");
+      statusEl.textContent = "Memverifikasi token...";
+      statusEl.className = "small mt-1 text-primary";
+      
+      try {
+        const {ok, data, error} = await api("verifyResetToken", { token });
+        
+        if(ok) { 
+          statusEl.innerHTML = `<i class="fa-solid fa-circle-check me-1"></i>Token valid untuk: ${data?.email || ''}`; 
+          statusEl.className = "small mt-1 text-success"; 
+          return true; 
+        }
+        
+        statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark me-1"></i>Token tidak valid: ${error || 'Token kadaluarsa'}`; 
+        statusEl.className = "small mt-1 text-danger"; 
+        return false;
+      } catch(e) {
+        statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark me-1"></i>Gagal verifikasi token`; 
+        statusEl.className = "small mt-1 text-danger"; 
+        return false;
+      }
+    }
+    
+    $("#btnCheckToken").addEventListener("click", async () => {
+      const token = $("#resetToken").value.trim();
+      if (!token) { 
+        $("#resetToken").classList.add('is-invalid'); 
+        return; 
+      }
+      
+      await verifyToken(token);
+    });
+    
+    $("#resetToken").addEventListener("input", ()=>{
+      $("#resetToken").classList.remove('is-invalid'); 
+      $("#tokenStatus").textContent=""; 
+    });
+    
+    /* ===== Request Reset Token (Step 1) ===== */
+    $("#btnRequestToken").addEventListener("click", async ()=>{
+      const email = $("#resetEmail").value.trim();
+      
+      if (!email || !email.includes('@')) { 
+        $("#resetEmail").classList.add('is-invalid'); 
+        return; 
+      }
+      
+      $("#resetEmail").classList.remove('is-invalid');
+      $("#requestError").style.display = "none"; 
+      $("#requestSuccess").style.display = "none";
+      $("#spinRequest").style.display = "";
+      $("#requestBtnText").textContent = "Mengirim...";
+      $("#btnRequestToken").disabled = true;
+      
+      try{
+        const u = new URL(location.href); 
+        u.search=''; 
+        u.hash='';
+        const resetUrl = u.toString(); // backend akan menambah ?reset_token=...
+        
+        const {ok, data, error} = await api("requestPasswordReset", { email, resetUrl });
+        
+        if(!ok) throw new Error(error || "Gagal mengirim token");
+        
+        $("#requestSuccess").innerHTML = `<i class="fa-solid fa-circle-check me-1"></i>Token reset telah dikirim ke ${email}. Periksa inbox/spam Anda.`;
+        $("#requestSuccess").style.display = "";
+        
+        setTimeout(() => { 
+          showStep(2); 
+          $("#resetToken").focus(); 
+        }, 1500);
+      }catch(e){
+        $("#requestError").innerHTML = `<i class="fa-solid fa-circle-xmark me-1"></i>${e.message || "Gagal mengirim token"}`;
+        $("#requestError").style.display = "";
+      }finally{
+        $("#spinRequest").style.display = "none";
+        $("#requestBtnText").textContent = "Kirim Token";
+        $("#btnRequestToken").disabled = false;
+      }
+    });
+    
+    /* ===== Submit Reset Password (Step 2) ===== */
+    $("#formReset").addEventListener("submit", async (ev)=>{
+      ev.preventDefault();
+      
+      if (!$("#formReset").checkValidity()) { 
+        ev.stopPropagation(); 
+        $("#formReset").classList.add('was-validated'); 
+        return; 
+      }
+      
+      const token = $("#resetToken").value.trim();
+      const p1 = $("#newPwd1").value.trim();
+      const p2 = $("#newPwd2").value.trim();
+      
+      if(!token){ 
+        $("#resetToken").classList.add('is-invalid'); 
+        return; 
+      }
+      
+      if(p1.length < 6){ 
+        $("#newPwd1").classList.add('is-invalid'); 
+        return; 
+      }
+      
+      if(p1 !== p2){ 
+        $("#newPwd2").classList.add('is-invalid'); 
+        return; 
+      }
+      
+      $("#resetError").style.display = "none";
+      $("#resetSuccess").style.display = "none";
+      $("#spinReset").style.display = "";
+      $("#resetBtnText").textContent = "Mengubah...";
+      $("#btnReset").disabled = true;
+      
+      try{
+        const {ok, error} = await api("resetPassword", { token, newPassword: p1 });
+        
+        if(!ok) throw new Error(error || "Gagal reset password");
+        
+        $("#resetSuccess").innerHTML = `<i class="fa-solid fa-circle-check me-1"></i>Password berhasil diubah. Mengalihkan ke halaman login...`;
+        $("#resetSuccess").style.display = "";
+        
+        setTimeout(() => { 
+          showLoginForm(true); 
+          resetResetForm(); 
+        }, 2000);
+      }catch(e){
+        $("#resetError").innerHTML = `<i class="fa-solid fa-circle-xmark me-1"></i>${e.message || "Gagal reset password"}`;
+        $("#resetError").style.display = "";
+      }finally{
+        $("#spinReset").style.display = "none";
+        $("#resetBtnText").textContent = "Reset Password";
+        $("#btnReset").disabled = false;
+      }
+    });
+    
+    /* ===== Login ===== */
+    $("#formLogin").addEventListener("submit", async (ev)=>{
+      ev.preventDefault();
+      
+      if (!$("#formLogin").checkValidity()) { 
+        ev.stopPropagation(); 
+        $("#formLogin").classList.add('was-validated'); 
+        return; 
+      }
+      
+      $("#loginError").style.display = "none";
+      $("#spinLogin").style.display = "";
+      $("#loginBtnText").textContent = "Memproses...";
+      $("#btnLogin").disabled = true;
+      
+      try{
+        const email = $("#loginEmail").value.trim();
+        const password = $("#loginPassword").value.trim();
+        const remember = $("#rememberCheck").checked;
+        
+        const {ok, data, error} = await api("login", { email, password });
+        
+        if(!ok) throw new Error(error||"Login gagal");
+        
+        saveSession(data.token, data.user, remember);
+        
+        if (isManager(data.user)) {
+          location.href = "index.html"; 
+        } else { 
+          location.href = "staff.html"; 
+        }
+      }catch(e){
+        $("#loginError").innerHTML = `<i class="fa-solid fa-circle-xmark me-1"></i>${e.message || "Login gagal"}`;
+        $("#loginError").style.display = "";
+      }finally{
+        $("#spinLogin").style.display = "none";
+        $("#loginBtnText").textContent = "Masuk";
+        $("#btnLogin").disabled = false;
+      }
+    });
+    
+    /* ===== Auto-redirect bila sudah punya sesi valid ===== */
+    (async function verifySession(){
+      const { token } = readAnySession();
+      if(!token) return;
+      
+      try{
+        const me = await api("me", { token });
+        
+        if (me.ok) {
+          saveSession(token, me.data.user, true);
+          
+          if (isManager(me.data.user)) {
+            location.href = "index.html";
+          } else {
+            location.href = "staff.html";
+          }
+        }
+      }catch(e){}
+    })();
+    
+    /* ===== Animasi saat halaman dimuat ===== */
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tambahkan animasi fade-in untuk elemen utama
+      const fadeElements = document.querySelectorAll('.cardx');
+      fadeElements.forEach((el, index) => {
+        setTimeout(() => {
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
+        }, index * 100);
+      });
+    });
+  </script>
+</body>
+</html>

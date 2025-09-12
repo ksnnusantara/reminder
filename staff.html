@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PRSystem – Employee</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="auth.js"></script>
+<style>
+  :root{
+    --ink:#0f172a; 
+    --brand:#d4af37; /* Warna emas utama */
+    --brand-light:#f0d78c; /* Warna emas terang */
+    --brand-dark:#b8941f; /* Warna emas gelap */
+    --muted:#64748b; 
+    --line:#e2e8f0; 
+    --bg:#f8fafc; 
+    --ok:#16a34a; 
+    --warn:#f59e0b; 
+    --danger:#ef4444;
+    --light-bg:#f1f5f9; 
+    --card-shadow:0 4px 12px rgba(15, 23, 42, 0.08); 
+    --hover-shadow:0 8px 24px rgba(15, 23, 42, 0.12);
+    --sidebar-width:260px; 
+    --header-height:70px; 
+    --primary-gradient:linear-gradient(135deg, #d4af37 0%, #b8941f 100%); /* Gradien emas */
+    --gold-accent: linear-gradient(45deg, #d4af37, #f0d78c, #d4af37); /* Aksen emas */
+    --gold-text: #b8941f; /* Teks emas */
+  }
+  *{ box-sizing:border-box; font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif }
+  body{ margin:0; background:var(--bg); color:var(--ink); line-height:1.6 }
+  .app-container{ display:flex; min-height:100vh; }
+  .sidebar{ 
+    width:var(--sidebar-width); 
+    background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%); 
+    color:#fff; 
+    padding:24px 0; 
+    position:fixed; 
+    height:100vh; 
+    overflow-y:auto; 
+    z-index:100; 
+    box-shadow:4px 0 10px rgba(0,0,0,.1);
+    border-right: 3px solid var(--brand); /* Garis emas di sisi kanan sidebar */
+  }
+  .sidebar-header{ 
+    padding:0 24px 24px; 
+    border-bottom:1px solid rgba(255,255,255,.1); 
+    margin-bottom:24px;
+    text-align: center;
+  }
+  .logo{ 
+    display:flex; 
+    flex-direction: column;
+    align-items:center; 
+    gap:12px; 
+    margin-bottom:8px;
+  }
+  .logo-icon{ 
+    width:80px; 
+    height:80px; 
+    background:var(--brand); 
+    border-radius:50%; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    font-size:24px;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); /* Bayangan emas */
+    border: 3px solid var(--brand-light);
+    overflow: hidden;
+  }
+  .logo-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  .logo-text{ 
+    font-size:24px; 
+    font-weight:700;
+    background: var(--gold-accent);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0px 1px 2px rgba(0,0,0,0.2);
+    letter-spacing: 1px;
+  }
+  .logo-subtitle{ 
+    font-size:18px; 
+    color:var(--brand-light); 
+    margin-top: 5px;
+    font-weight: 600;
+    letter-spacing: 2px;
+  }
+  .nav-menu{ list-style:none; padding:0; margin:0 }
+  .nav-link{ 
+    display:flex; 
+    align-items:center; 
+    gap:12px; 
+    padding:14px 24px; 
+    color:rgba(255,255,255,.8); 
+    text-decoration:none; 
+    font-weight:500; 
+    transition:.2s; 
+    cursor:pointer;
+    position: relative;
+  }
+  .nav-link:hover{ 
+    background:rgba(212, 175, 55, 0.15); /* Latar belakang emas saat hover */
+    color:#fff;
+  }
+  .nav-link.active{ 
+    background:rgba(212, 175, 55, 0.2);
+    color:#fff;
+    position:relative;
+  }
+  .nav-link.active::before{ 
+    content:''; 
+    position:absolute; 
+    left:0; 
+    top:0; 
+    height:100%; 
+    width:4px; 
+    background:var(--brand);
+  }
+  .nav-icon{ 
+    width:20px; 
+    text-align:center;
+    color: var(--brand-light);
+  }
+  .main-content{ 
+    flex:1; 
+    margin-left:var(--sidebar-width); 
+    display:flex; 
+    flex-direction:column;
+  }
+  .header{ 
+    height:var(--header-height); 
+    background:#fff; 
+    border-bottom:1px solid var(--line); 
+    display:flex; 
+    align-items:center; 
+    justify-content:space-between; 
+    padding:0 32px; 
+    position:sticky; 
+    top:0; 
+    z-index:90; 
+    box-shadow:0 2px 10px rgba(0,0,0,.05);
+  }
+  .page-title{ 
+    font-size:24px; 
+    font-weight:700; 
+    display:flex; 
+    align-items:center; 
+    gap:12px;
+    color: var(--ink);
+  }
+  .content{ 
+    padding:32px; 
+    max-width:1200px; 
+    margin:0 auto; 
+    width:100%;
+  }
+  .page-section{ 
+    display:none; 
+    animation:fadeIn .4s ease;
+  }
+  .page-section.active{ 
+    display:block;
+  }
+  @keyframes fadeIn{ 
+    from{opacity:0; transform:translateY(10px)} 
+    to{opacity:1; transform:translateY(0)} 
+  }
+  .card{ 
+    background:#fff; 
+    border-radius:16px; 
+    box-shadow:var(--card-shadow); 
+    padding:24px; 
+    margin-bottom:24px; 
+    border:1px solid var(--line); 
+    transition:.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--primary-gradient);
+  }
+  .card:hover{ 
+    box-shadow:var(--hover-shadow); 
+    transform:translateY(-2px);
+  }
+  .card-header{ 
+    display:flex; 
+    justify-content:space-between; 
+    align-items:center; 
+    margin-bottom:16px; 
+    padding-bottom:12px; 
+    border-bottom:1px solid var(--line);
+  }
+  .card-title{ 
+    margin:0; 
+    font-size:20px; 
+    font-weight:600;
+    color: var(--ink);
+  }
+  .btn{ 
+    display:inline-flex; 
+    align-items:center; 
+    gap:8px; 
+    padding:10px 16px; 
+    border-radius:10px; 
+    font-weight:500; 
+    cursor:pointer; 
+    border:none; 
+    font-size:14px; 
+    white-space:nowrap;
+    transition: all 0.2s ease;
+  }
+  .btn-primary{ 
+    background:var(--primary-gradient); 
+    color:#fff;
+    box-shadow: 0 4px 8px rgba(212, 175, 55, 0.3);
+  }
+  .btn-primary:hover{ 
+    filter:brightness(1.05); 
+    transform:translateY(-1px); 
+    box-shadow:0 6px 12px rgba(212, 175, 55, 0.4);
+  }
+  .btn-secondary{ 
+    background:#fff; 
+    color:var(--ink); 
+    border:1px solid var(--line);
+  }
+  .btn-secondary:hover{ 
+    background:var(--light-bg); 
+    border-color:var(--brand); 
+    color:var(--brand);
+  }
+  .btn-sm{ 
+    padding:8px 12px; 
+    font-size:13px;
+  }
+  .btn-icon{ 
+    width:36px; 
+    height:36px; 
+    padding:0; 
+    border-radius:8px;
+  }
+  .form-control{ 
+    width:100%; 
+    padding:12px 16px; 
+    border:1px solid var(--line); 
+    border-radius:10px; 
+    font-size:14px; 
+    transition:.2s; 
+    background:#fff;
+  }
+  .form-control:focus{ 
+    outline:none; 
+    border-color:var(--brand); 
+    box-shadow:0 0 0 3px rgba(212, 175, 55, 0.1);
+  }
+  .grid{ 
+    display:grid; 
+    gap:24px;
+  }
+  .grid-cols-12{ 
+    grid-template-columns:repeat(12,1fr);
+  }
+  .col-span-2{ 
+    grid-column:span 2;
+  } 
+  .col-span-3{ 
+    grid-column:span 3;
+  } 
+  .col-span-4{ 
+    grid-column:span 4;
+  } 
+  .col-span-6{ 
+    grid-column:span 6;
+  } 
+  .col-span-12{ 
+    grid-column:span 12;
+  }
+  .form-group{ 
+    display:flex; 
+    flex-direction:column; 
+    gap:8px;
+  }
+  .form-label{ 
+    font-size:14px; 
+    color:var(--ink); 
+    font-weight:600;
+  }
+  .kpi-card{ 
+    background:#fff; 
+    border-radius:16px; 
+    padding:24px; 
+    box-shadow:var(--card-shadow); 
+    border:1px solid var(--line); 
+    position:relative; 
+    overflow:hidden;
+    transition: all 0.3s ease;
+  }
+  .kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--hover-shadow);
+  }
+  .kpi-card::before{ 
+    content:''; 
+    position:absolute; 
+    top:0; 
+    left:0; 
+    width:6px; 
+    height:100%;
+  }
+  .kpi-card.total::before{ 
+    background:var(--brand);
+  } 
+  .kpi-card.due::before{ 
+    background:var(--warn);
+  } 
+  .kpi-card.done::before{ 
+    background:var(--ok);
+  }
+  .kpi-icon{ 
+    width:48px; 
+    height:48px; 
+    border-radius:12px; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    font-size:20px; 
+    margin-bottom:16px;
+  }
+  .kpi-icon.total{ 
+    background:rgba(212, 175, 55, 0.1); 
+    color:var(--brand);
+  }
+  .kpi-icon.due{ 
+    background:rgba(245,158,11,.1); 
+    color:var(--warn);
+  }
+  .kpi-icon.done{ 
+    background:rgba(22,163,74,.1); 
+    color:var(--ok);
+  }
+  .kpi-value{ 
+    font-size:36px; 
+    font-weight:700; 
+    line-height:1; 
+    margin-bottom:8px;
+  }
+  .kpi-label{ 
+    font-size:14px; 
+    color:var(--muted); 
+    font-weight:500;
+  }
+  .status-pills{ 
+    display:flex; 
+    flex-wrap:wrap; 
+    gap:12px; 
+    margin-top:8px;
+  }
+  .status-pill{ 
+    display:inline-flex; 
+    align-items:center; 
+    gap:6px; 
+    padding:8px 16px; 
+    border-radius:20px; 
+    font-size:13px; 
+    font-weight:500;
+  }
+  .status-dot{ 
+    width:8px; 
+    height:8px; 
+    border-radius:50%;
+  }
+  .status-pill.ok{ 
+    background:rgba(22,163,74,.1); 
+    color:var(--ok);
+  } 
+  .status-pill.ok .status-dot{ 
+    background:var(--ok);
+  }
+  .status-pill.warn{ 
+    background:rgba(245,158,11,.1); 
+    color:var(--warn);
+  } 
+  .status-pill.warn .status-dot{ 
+    background:var(--warn);
+  }
+  .status-pill.danger{ 
+    background:rgba(239,68,68,.1); 
+    color:var(--danger);
+  } 
+  .status-pill.danger .status-dot{ 
+    background:var(--danger);
+  }
+  .table-container{ 
+    border-radius:12px; 
+    overflow:hidden; 
+    border:1px solid var(--line);
+  }
+  .table{ 
+    width:100%; 
+    border-collapse:collapse;
+  }
+  .table th{ 
+    background:var(--light-bg); 
+    padding:14px 16px; 
+    text-align:left; 
+    font-weight:600; 
+    font-size:13px; 
+    color:var(--muted); 
+    text-transform:uppercase; 
+    letter-spacing:.5px;
+  }
+  .table td{ 
+    padding:12px 16px; 
+    border-top:1px solid var(--line); 
+    font-size:14px;
+  }
+  .table tr:hover{ 
+    background:rgba(212, 175, 55, 0.02);
+  }
+  .progress{ 
+    height:8px; 
+    background:var(--line); 
+    border-radius:4px; 
+    overflow:hidden; 
+    margin-top:4px;
+  }
+  .progress-bar{ 
+    height:100%; 
+    background:var(--primary-gradient);
+    border-radius:4px; 
+    transition:width .3s;
+  }
+  .toast-container{ 
+    position:fixed; 
+    bottom:24px; 
+    right:24px; 
+    z-index:1000;
+  }
+  .toast{ 
+    background:#fff; 
+    border-radius:12px; 
+    box-shadow:0 8px 24px rgba(0,0,0,.15); 
+    padding:16px 20px; 
+    margin-bottom:12px; 
+    display:flex; 
+    align-items:center; 
+    gap:12px; 
+    min-width:300px; 
+    max-width:400px; 
+    transform:translateX(120%); 
+    transition:.3s; 
+    border-left:4px solid var(--ok);
+  }
+  .toast.show{ 
+    transform:translateX(0);
+  }
+  .toast-success{ 
+    background:rgba(22,163,74,.1); 
+    color:var(--ok);
+  } 
+  .toast-error{ 
+    background:rgba(239,68,68,.1); 
+    color:var(--danger); 
+    border-left-color:var(--danger);
+  }
+  .badge {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 10px; border-radius:999px; font-size:12px; font-weight:600;
+    border:1px solid var(--line);
+  }
+  .badge.pending { 
+    background:rgba(245,158,11,.08); 
+    color:var(--warn); 
+    border-color:rgba(245,158,11,.25);
+  }
+  .badge.approved{ 
+    background:rgba(22,163,74,.08);  
+    color:var(--ok);   
+    border-color:rgba(22,163,74,.25);
+  }
+  .badge.rejected{ 
+    background:rgba(239,68,68,.08);  
+    color:var(--danger);
+    border-color:rgba(239,68,68,.25);
+  }
+  @media (max-width:1024px){ 
+    .sidebar{ 
+      transform:translateX(-100%);
+    } 
+    .sidebar.active{ 
+      transform:translateX(0);
+    } 
+    .main-content{ 
+      margin-left:0;
+    }
+  }
+  @media (max-width:768px){ 
+    .content{ 
+      padding:16px;
+    } 
+    .grid{ 
+      gap:16px;
+    } 
+    .card{ 
+      padding:16px;
+    } 
+    .grid-cols-12{ 
+      grid-template-columns:1fr;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app-container">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <img src="logo.jpg" alt="Logo KSN" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <i class="fas fa-gem" style="display:none;"></i>
+        </div>
+        <div class="logo-text">KSN</div>
+        <div class="logo-subtitle">REMINDER KSN</div>
+      </div>
+    </div>
+    <nav>
+      <ul class="nav-menu">
+        <li><a class="nav-link active" data-section="dashboard"><i class="fas fa-home nav-icon"></i><span>Dashboard</span></a></li>
+        <li><a class="nav-link" data-section="reminders"><i class="fas fa-bell nav-icon"></i><span>Reminders</span></a></li>
+        <li><a class="nav-link" data-section="ajukan"><i class="fas fa-folder-plus nav-icon"></i><span>Ajukan Proyek</span></a></li>
+        <li><a class="nav-link" data-section="expense"><i class="fas fa-receipt nav-icon"></i><span>Expense</span></a></li>
+        <li><a class="nav-link" data-section="profile"><i class="fas fa-user-circle nav-icon"></i><span>Profile</span></a></li>
+      </ul>
+    </nav>
+  </aside>
+  <div class="main-content">
+    <header class="header">
+      <div class="page-title"><i class="fas fa-home" id="page-icon"></i><span id="page-title-text">Dashboard</span></div>
+      <div style="display:flex; gap:8px; align-items:center">
+        <span id="user-name" style="font-size:14px; color:var(--muted)"></span>
+        <button class="btn btn-secondary btn-sm" id="btn-logout"><i class="fas fa-right-from-bracket"></i> Logout</button>
+        <button class="btn btn-icon" id="menu-toggle"><i class="fas fa-bars"></i></button>
+      </div>
+    </header>
+    <main class="content">
+      <div id="dashboard" class="page-section active">
+        <div class="grid grid-cols-12">
+          <div class="col-span-4">
+            <div class="kpi-card total">
+              <div class="kpi-icon total"><i class="fas fa-list-check"></i></div>
+              <div class="kpi-value" id="kpi-total">0</div>
+              <div class="kpi-label">Total Tugas</div>
+            </div>
+          </div>
+          <div class="col-span-4">
+            <div class="kpi-card due">
+              <div class="kpi-icon due"><i class="fas fa-bell"></i></div>
+              <div class="kpi-value" id="kpi-due">0</div>
+              <div class="kpi-label">Jatuh Tempo (H/H-1)</div>
+            </div>
+          </div>
+          <div class="col-span-4">
+            <div class="kpi-card done">
+              <div class="kpi-icon done"><i class="fas fa-check-circle"></i></div>
+              <div class="kpi-value" id="kpi-done">0</div>
+              <div class="kpi-label">Selesai</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Status Overview</h3></div>
+          <div class="status-pills" id="status-overview"></div>
+        </div>
+      </div>
+      <div id="reminders" class="page-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Tugas Saya</h3>
+            <button class="btn btn-secondary btn-sm" id="btn-load-rem"><i class="fas fa-sync-alt"></i> Muat Ulang</button>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Project</th>
+                  <th>Deadline</th>
+                  <th>Priority</th>
+                  <th>Progress</th>
+                  <th>Status</th>
+                  <th>Update</th>
+                </tr>
+              </thead>
+              <tbody id="tbl-rem"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Update Progress</h3></div>
+          <div class="grid grid-cols-12">
+            <div class="col-span-4"><input class="form-control" id="up-project" placeholder="Nama project (persis seperti di tabel)"></div>
+            <div class="col-span-2"><input type="number" class="form-control" id="up-progress" min="0" max="100" value="0" placeholder="%"></div>
+            <div class="col-span-6"><input class="form-control" id="up-link" placeholder="Submission link (https://...)"></div>
+            <div class="col-span-12"><input class="form-control" id="up-notes" placeholder="Catatan (opsional)"></div>
+            <div class="col-span-2"><button class="btn btn-primary" id="btn-update-progress"><i class="fas fa-save"></i> Simpan</button></div>
+          </div>
+        </div>
+      </div>
+      <div id="ajukan" class="page-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Ajukan Proyek Baru</h3>
+          </div>
+          <div class="grid grid-cols-12">
+            <div class="col-span-6">
+              <div class="form-group">
+                <label class="form-label" for="pj-judul">Judul Proyek</label>
+                <input type="text" class="form-control" id="pj-judul" placeholder="Contoh: Sistem Informasi Koperasi" autocomplete="off">
+              </div>
+            </div>
+            <div class="col-span-12">
+              <div class="form-group">
+                <label class="form-label" for="pj-desc">Deskripsi</label>
+                <textarea class="form-control" id="pj-desc" rows="4" placeholder="Tuliskan deskripsi proyek..."></textarea>
+              </div>
+            </div>
+            <div class="col-span-4">
+              <div class="form-group">
+                <label class="form-label" for="pj-biaya">Total Biaya (Rp)</label>
+                <input type="number" class="form-control" id="pj-biaya" placeholder="0" min="0" step="1000" inputmode="numeric">
+              </div>
+            </div>
+            <div class="col-span-12">
+              <button class="btn btn-primary" id="btn-ajukan-projek">
+                <i class="fas fa-paper-plane"></i> <span id="btn-ajukan-text">Ajukan</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><span id="judul-daftar">Pengajuan Proyek</span></h3>
+            <button class="btn btn-secondary btn-sm" id="btn-refresh-pengajuan">
+              <i class="fas fa-sync-alt"></i> Muat Ulang
+            </button>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr id="thead-pengajuan">
+                  </tr>
+              </thead>
+              <tbody id="tbl-pengajuan"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="expense" class="page-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Penggunaan Uang (Expense)</h3>
+          </div>
+          <div class="grid grid-cols-12">
+            <div class="col-span-6">
+              <div class="form-group">
+                <label class="form-label">Project (Approved)</label>
+                <select id="ex-project" class="form-control form-select"></select>
+              </div>
+            </div>
+            <div class="col-span-3">
+              <div class="form-group">
+                <label class="form-label">Tanggal</label>
+                <input type="date" id="ex-date" class="form-control">
+              </div>
+            </div>
+            <div class="col-span-3">
+              <div class="form-group">
+                <label class="form-label">Jumlah (Rp)</label>
+                <input type="number" id="ex-amount" class="form-control" min="0" step="1000" placeholder="0">
+              </div>
+            </div>
+            <div class="col-span-12">
+              <div class="form-group">
+                <label class="form-label">Deskripsi</label>
+                <input type="text" id="ex-desc" class="form-control" placeholder="Untuk apa pengeluaran ini">
+              </div>
+            </div>
+            <div class="col-span-12">
+              <button class="btn btn-primary" id="btn-save-expense"><i class="fas fa-save"></i> Simpan</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Daftar Expense Saya</h3></div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Project</th>
+                  <th>Tanggal</th>
+                  <th>Deskripsi</th>
+                  <th>Jumlah</th>
+                </tr>
+              </thead>
+              <tbody id="tbl-expense-my"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="profile" class="page-section">
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Profil</h3></div>
+          <div id="profile-box">
+            <p><strong>Nama:</strong> <span id="pf-nama">-</span></p>
+            <p><strong>Email:</strong> <span id="pf-email">-</span></p>
+            <p><strong>Role:</strong> <span id="pf-role">-</span></p>
+            <p><strong>NPK:</strong> <span id="pf-npk">-</span></p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div class="toast-container" id="toast-container"></div>
+<script>
+/* ===================== KONFIG API ===================== */
+const API_BASE = 'https://script.google.com/macros/s/AKfycbwVgPZ9TnMDG-5h3vUy8e8YG-n9cTT2U73PNdzOXjPLWQRVeoiljRWSGx3nheMDuV33Sw/exec';
+async function api(fn, data){
+  const payload = new URLSearchParams({ function: fn, data: JSON.stringify(data || {}) });
+  const res = await fetch(API_BASE, { method:'POST', body: payload });
+  const json = await res.json().catch(()=>({ ok:false, error:'Response tidak valid' }));
+  return json;
+}
+/* ===================== STATE ===================== */
+let __myReminders = [];
+let __me = null;
+/* ===================== HELPERS ===================== */
+const getToken = () => (readAnySession()?.token || '');
+const getUser  = () => (readAnySession()?.user  || {});
+async function call(fn, payload = {}){
+  const token = getToken();
+  const data = Object.assign({ token }, payload || {});
+  const res = await api(fn, data);
+  if(!res?.ok) throw new Error(res?.error || 'Error');
+  return res.data;
+}
+function showToast(message, type='success'){
+  const box = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type==='error'?'toast-error':'toast-success');
+  el.innerHTML = `
+    <div class="${type==='error'?'toast-error':'toast-success'}" style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center">
+      <i class="${type==='error'?'fas fa-times-circle':'fas fa-check-circle'}"></i>
+    </div>
+    <div><div style="font-weight:600;margin-bottom:2px">${type==='error'?'Error':'Success'}</div>
+    <div style="font-size:14px;color:var(--muted)">${message}</div></div>`;
+  box.appendChild(el); setTimeout(()=>el.classList.add('show'),10);
+  setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(),300); },3000);
+}
+function fmtDateISO(dStr){
+  if(!dStr) return '-';
+  const d = new Date(dStr);
+  const opts = { day:'2-digit', month:'short', year:'numeric' };
+  return d.toLocaleDateString('id-ID', opts);
+}
+function isHOrH1(dStr){
+  if(!dStr) return false;
+  const d = new Date(dStr);
+  const now = new Date();
+  const today = new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const tomorrow = new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+  const only = new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  return (only.getTime()===today.getTime()) || (only.getTime()===tomorrow.getTime());
+}
+function fmtRupiah(n){ return Number(n||0).toLocaleString('id-ID'); }
+function fmtTanggal(t){ if(!t) return '-'; return new Date(t).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}); }
+function esc(s){ return (s||'').toString().replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function isManagerRole(role){
+  const r = String(role||'').toLowerCase();
+  return ['manager','admin','owner','supervisor','lead'].includes(r);
+}
+function statusBadge(s){
+  const v = String(s||'MENUNGGU').toUpperCase();
+  if (v==='SETUJU' || v==='APPROVED') return `<span class="badge approved"><i class="fas fa-check-circle"></i> Disetujui</span>`;
+  if (v==='TOLAK'  || v==='REJECTED') return `<span class="badge rejected"><i class="fas fa-times-circle"></i> Ditolak</span>`;
+  return `<span class="badge pending"><i class="fas fa-hourglass-half"></i> Menunggu</span>`;
+}
+/* ===================== NAV ===================== */
+const pageLinks = document.querySelectorAll('.nav-link');
+const pageSections = document.querySelectorAll('.page-section');
+const pageTitle = document.getElementById('page-title-text');
+const pageIcon = document.getElementById('page-icon');
+const icons = { dashboard:'fas fa-home', reminders:'fas fa-bell', ajukan:'fas fa-folder-plus', expense: 'fas fa-receipt', profile:'fas fa-user-circle' };
+const titles = { dashboard:'Dashboard', reminders:'Reminders', ajukan:'Ajukan Proyek', expense: 'Expense', profile:'Profile' };
+pageLinks.forEach(link=>{
+  link.addEventListener('click', e=>{
+    e.preventDefault();
+    const target = link.dataset.section;
+    pageLinks.forEach(l=>l.classList.remove('active')); link.classList.add('active');
+    pageSections.forEach(s=>s.classList.remove('active'));
+    document.getElementById(target).classList.add('active');
+    pageTitle.textContent = titles[target]; pageIcon.className = icons[target];
+    if(target==='dashboard') recomputeDashboard();
+    if(target==='reminders') loadReminders();
+    if(target==='profile')   fillProfile();
+    if(target==='ajukan')    loadPengajuan(); // penting
+  });
+});
+document.getElementById('menu-toggle').addEventListener('click', ()=> document.getElementById('sidebar').classList.toggle('active'));
+/* ===================== REMINDERS ===================== */
+async function loadReminders(){
+  const tbody = document.getElementById('tbl-rem');
+  tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding:16px"><i class="fas fa-spinner fa-spin"></i> Memuat...</td></tr>';
+  try{
+    const rows = await call('listReminders', {});
+    __myReminders = rows || [];
+    if(!rows.length){
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding:16px;color:var(--muted)">Tidak ada tugas</td></tr>';
+      recomputeDashboard();
+      return;
+    }
+    tbody.innerHTML = rows.map(r=>{
+      const prog = Number(r.PROGRESS||0);
+      const statusPill = prog>=100 ? `<span class="status-pill ok"><span class="status-dot"></span> DONE</span>` :
+                                      `<span class="status-pill warn"><span class="status-dot"></span> OPEN</span>`;
+      return `
+        <tr>
+          <td><strong>${esc(r.PROJECT)}</strong></td>
+          <td>${fmtDateISO(r.DEADLINE)}</td>
+          <td>${(r.PRIORITY||'-')}</td>
+          <td>
+            <div>${prog}%</div>
+            <div class="progress"><div class="progress-bar" style="width:${prog}%"></div></div>
+          </td>
+          <td>${statusPill}</td>
+          <td>
+            <button class="btn btn-sm btn-primary" data-up='${encodeURIComponent(JSON.stringify({project:r.PROJECT}))}'>
+              <i class="fas fa-pen"></i> Pilih
+            </button>
+          </td>
+        </tr>`;
+    }).join('');
+    tbody.querySelectorAll('[data-up]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const { project } = JSON.parse(decodeURIComponent(btn.getAttribute('data-up')));
+        document.getElementById('up-project').value = project || '';
+        const found = __myReminders.find(x=>String(x.PROJECT||'')===String(project||''));
+        document.getElementById('up-progress').value = found ? Number(found.PROGRESS||0) : 0;
+        document.getElementById('up-link').value = found ? (found.SUBMISSION_LINK||'') : '';
+        document.getElementById('up-notes').value = found ? (found.NOTES||'') : '';
+        showToast('Form diisi dari baris terpilih');
+      });
+    });
+    recomputeDashboard();
+  }catch(e){
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding:16px;color:var(--danger)">Error: ${e.message}</td></tr>`;
+  }
+}
+document.getElementById('btn-load-rem').addEventListener('click', loadReminders);
+document.getElementById('btn-update-progress').addEventListener('click', async ()=>{
+  try{
+    const project = document.getElementById('up-project').value.trim();
+    const progress = Number(document.getElementById('up-progress').value || 0);
+    const notes = document.getElementById('up-notes').value;
+    const link = document.getElementById('up-link').value;
+    if(!project) return showToast('Nama project wajib diisi','error');
+    if(isNaN(progress) || progress<0 || progress>100) return showToast('Progress harus 0–100','error');
+    await call('updateProgress', { project, progress, notes, link });
+    showToast('Progress berhasil diperbarui');
+    await loadReminders();
+  }catch(e){ showToast(e.message,'error'); }
+});
+/* ===================== AJUKAN PROYEK ===================== */
+function buildPengajuanHeader(isMgr){
+  const thead = document.getElementById('thead-pengajuan');
+  thead.innerHTML = '';
+  const cols = [
+    {key:'Judul', label:'Judul'},
+    {key:'Biaya', label:'Biaya'},
+    ...(isMgr ? [{key:'Pemohon', label:'Pemohon'}] : []),
+    {key:'Status', label:'Status'},
+    {key:'Created', label:'Created'},
+    {key:'Approved', label:'Approved'},
+    ...(isMgr ? [{key:'Aksi', label:'Aksi'}] : [])
+  ];
+  cols.forEach(c=>{
+    const th = document.createElement('th'); th.textContent = c.label; thead.appendChild(th);
+  });
+}
+function statusBadge(s){
+  const v = String(s||'MENUNGGU').toUpperCase();
+  if (v==='SETUJU' || v==='APPROVED') return `<span class="badge approved"><i class="fas fa-check-circle"></i> Disetujui</span>`;
+  if (v==='TOLAK'  || v==='REJECTED') return `<span class="badge rejected"><i class="fas fa-times-circle"></i> Ditolak</span>`;
+  return `<span class="badge pending"><i class="fas fa-hourglass-half"></i> Menunggu</span>`;
+}
+async function loadPengajuan(){
+  const role = (__me?.user?.role || '').toLowerCase();
+  const isMgr = isManagerRole(role);
+  const tbody = document.getElementById('tbl-pengajuan');
+  const title = document.getElementById('judul-daftar');
+  buildPengajuanHeader(isMgr);
+  title.textContent = isMgr ? 'Pengajuan Proyek (Semua - Manager)' : 'Pengajuan Proyek Saya';
+  tbody.innerHTML = `<tr><td colspan="${isMgr?7:5}" style="padding:16px;text-align:center"><i class="fas fa-spinner fa-spin"></i> Memuat...</td></tr>`;
+  try{
+    const rows = isMgr ? await call('listPengajuan', {}) : await call('listPengajuanSaya', {});
+    const list = Array.isArray(rows) ? rows : [];
+    if(!list.length){
+      tbody.innerHTML = `<tr><td colspan="${isMgr?7:5}" style="padding:14px;text-align:center;color:var(--muted)">Belum ada pengajuan</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = list.map(r=>{
+      const judul = esc(r.Judul);
+      const pemohon = `${esc(r.PemohonNama||'')}${r.PemohonNama?' · ':''}${esc(r.PemohonEmail||'')}`;
+      const approved = r.ApprovedBy ? `${esc(r.ApprovedBy)}<br><small>${fmtTanggal(r.ApprovedAt)}</small>` : '-';
+      const aksi = isMgr ? `
+        <td>
+          <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap">
+            <select class="form-control" data-id="${r.ID}" data-type="status">
+              <option value="MENUNGGU" ${String(r.Status).toUpperCase()==='MENUNGGU'?'selected':''}>Menunggu</option>
+              <option value="SETUJU" ${String(r.Status).toUpperCase()==='SETUJU'?'selected':''}>Setuju</option>
+              <option value="TOLAK"  ${String(r.Status).toUpperCase()==='TOLAK'?'selected':''}>Tolak</option>
+            </select>
+            <button class="btn btn-sm btn-primary" data-id="${r.ID}" data-type="save"><i class="fas fa-save"></i> Update</button>
+          </div>
+        </td>` : '';
+      return `<tr>
+        <td><strong>${judul}</strong></td>
+        <td>Rp ${fmtRupiah(r.Biaya)}</td>
+        ${isMgr?`<td>${pemohon||'-'}</td>`:''}
+        <td>${statusBadge(r.Status)}</td>
+        <td>${fmtTanggal(r.CreatedAt)}</td>
+        <td>${approved}</td>
+        ${aksi}
+      </tr>`;
+    }).join('');
+    if (isMgr){
+      tbody.querySelectorAll('button[data-type="save"]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const id = btn.getAttribute('data-id');
+          const sel = tbody.querySelector(`select[data-id="${id}"][data-type="status"]`);
+          const status = sel?.value || 'MENUNGGU';
+          try{
+            await call('updatePengajuan', { id, status });
+            showToast('Status diperbarui');
+            await loadPengajuan();
+          }catch(e){ showToast(e.message,'error'); }
+        });
+      });
+    }
+  }catch(e){
+    tbody.innerHTML = `<tr><td colspan="${isMgr?7:5}" style="padding:14px;color:var(--danger)">Gagal memuat: ${e.message}</td></tr>`;
+  }
+}
+document.getElementById('btn-refresh-pengajuan').addEventListener('click', loadPengajuan);
+document.getElementById('btn-ajukan-projek').addEventListener('click', async ()=>{
+  const btn = document.getElementById('btn-ajukan-projek');
+  const btnTxt = document.getElementById('btn-ajukan-text');
+  const judul = document.getElementById('pj-judul').value.trim();
+  const desc  = document.getElementById('pj-desc').value.trim();
+  const biayaStr = document.getElementById('pj-biaya').value.trim();
+  const biaya = Number(biayaStr);
+  if(!judul || !desc || biayaStr===''){
+    showToast('Semua field wajib diisi','error'); return;
+  }
+  if(isNaN(biaya) || biaya < 0){
+    showToast('Total biaya harus angka dan ≥ 0','error'); return;
+  }
+  try {
+    btn.disabled = true; btnTxt.textContent = 'Mengirim...';
+    await call('ajukanProyek', { judul, deskripsi: desc, biaya });
+    showToast('Pengajuan berhasil dikirim');
+    document.getElementById('pj-judul').value='';
+    document.getElementById('pj-desc').value='';
+    document.getElementById('pj-biaya').value='';
+    await loadPengajuan();
+  } catch(e){
+    showToast(e.message,'error');
+  } finally {
+    btn.disabled = false; btnTxt.textContent = 'Ajukan';
+  }
+});
+/* ===================== EXPENSE (STAFF) ===================== */
+// Muat project Approved yang relevan utk staff ini (boleh berdasarkan owner/assignee)
+async function loadApprovedProjectsForStaff() {
+  try {
+    const approved = await call('getApprovedProjects', {}); // hanya proyek SETUJU milik staff ini
+    const sel = document.getElementById('ex-project');
+    sel.innerHTML = '';
+    if (!approved || approved.length === 0) {
+      sel.innerHTML = '<option value="">(Belum ada proyek disetujui)</option>';
+      return;
+    }
+    sel.innerHTML = approved.map(p =>
+      `<option value="${esc(p.Project)}">${esc(p.Project)} — Rp ${fmtRupiah(p.Amount)}</option>`
+    ).join('');
+  } catch(e){
+    showToast(e.message || 'Gagal memuat project Approved', 'error');
+  }
+}
+async function loadMyExpenses(){
+  try{
+    const rows = await call('getExpenses', {}); // backend otomatis filter milik staff berdasar token
+    const tbody = document.getElementById('tbl-expense-my');
+    tbody.innerHTML = '';
+    if (!rows || rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="padding:12px;color:var(--muted)">Belum ada expense</td></tr>';
+      return;
+    }
+    rows.forEach(x => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${esc(x.Project)}</td>
+        <td>${fmtTanggal(x.Date)}</td>
+        <td>${esc(x.Desc)}</td>
+        <td>Rp ${fmtRupiah(x.Amount)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }catch(e){
+    showToast(e.message || 'Gagal memuat expense', 'error');
+  }
+}
+async function saveExpense(){
+  try{
+    const project = document.getElementById('ex-project').value;
+    const date    = document.getElementById('ex-date').value;
+    const amount  = Number(document.getElementById('ex-amount').value || 0);
+    const desc    = document.getElementById('ex-desc').value;
+    if(!project) throw new Error('Project wajib dipilih');
+    if(!date)    throw new Error('Tanggal wajib diisi');
+    if(amount<=0)throw new Error('Jumlah harus > 0');
+    await call('addExpense', { project, date, amount, desc }); // backend: simpan + tautkan ke staff (token user)
+    showToast('Expense tersimpan');
+    await loadMyExpenses();
+    // reset form
+    document.getElementById('ex-amount').value = '';
+    document.getElementById('ex-desc').value = '';
+  }catch(e){
+    showToast(e.message || 'Gagal simpan expense', 'error');
+  }
+}
+document.querySelector('[data-section="expense"]')?.addEventListener('click', () => {
+  setTimeout(async () => {
+    await loadApprovedProjectsForStaff();
+    await loadMyExpenses();
+  }, 50);
+});
+document.getElementById('btn-save-expense')?.addEventListener('click', saveExpense);
+/* ===================== DASHBOARD ===================== */
+function recomputeDashboard(){
+  const rows = __myReminders || [];
+  const total = rows.length;
+  const due = rows.filter(r=>isHOrH1(r.DEADLINE)).length;
+  const done = rows.filter(r=>Number(r.PROGRESS||0)>=100 || String(r.STATUS||'').toUpperCase()==='DONE').length;
+  document.getElementById('kpi-total').textContent = total;
+  document.getElementById('kpi-due').textContent = due;
+  document.getElementById('kpi-done').textContent = done;
+  const box = document.getElementById('status-overview');
+  box.innerHTML = '';
+  const map = {};
+  rows.forEach(r=>{
+    const s = (r.STATUS || (Number(r.PROGRESS||0)>=100?'DONE':'OPEN')).toString().toUpperCase();
+    map[s] = (map[s]||0)+1;
+  });
+  Object.entries(map).forEach(([s,c])=>{
+    const pill = document.createElement('div');
+    pill.className = 'status-pill';
+    if(s.includes('DONE')) pill.classList.add('ok'); else pill.classList.add('warn');
+    pill.innerHTML = `<span class="status-dot"></span><span>${s}: ${c}</span>`;
+    box.appendChild(pill);
+  });
+}
+/* ===================== PROFILE / INIT ===================== */
+function fillProfile(){
+  const u = getUser() || {};
+  document.getElementById('pf-nama').textContent = u.nama || '-';
+  document.getElementById('pf-email').textContent = u.email || '-';
+  document.getElementById('pf-role').textContent = u.role || '-';
+  document.getElementById('pf-npk').textContent = u.npk || '-';
+  const nameEl = document.getElementById('user-name');
+  if (nameEl) nameEl.textContent = u.nama ? `${u.nama} (${u.role||'-'})` : (u.email||'');
+}
+document.getElementById('btn-logout').addEventListener('click', async ()=>{
+  try{ await call('logout', {}); }catch(e){}
+  doLogout();
+});
+document.addEventListener('DOMContentLoaded', ()=>{
+  // izinkan staff & manager
+  requireAuth(['staff','manager','admin','owner','supervisor','lead'], async ({ user })=>{
+    __me = await call('me', {}); // pastikan role/email dari server
+    fillProfile();
+    await loadReminders();
+    recomputeDashboard();
+    await loadPengajuan();
+  });
+});
+</script>
+</body>
+</html>

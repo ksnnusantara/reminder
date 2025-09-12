@@ -1,0 +1,2467 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Project Reminder System – Professional UI</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root{
+    --ink:#0f172a; 
+    --brand:#d4af37; /* Warna emas utama */
+    --brand-light:#f0d78c; /* Warna emas terang */
+    --brand-dark:#b8941f; /* Warna emas gelap */
+    --muted:#64748b; 
+    --line:#e2e8f0; 
+    --bg:#f8fafc; 
+    --ok:#16a34a; 
+    --warn:#f59e0b; 
+    --danger:#ef4444;
+    --light-bg:#f1f5f9; 
+    --card-shadow:0 4px 12px rgba(15, 23, 42, 0.08); 
+    --hover-shadow:0 8px 24px rgba(15, 23, 42, 0.12);
+    --sidebar-width:260px; 
+    --header-height:70px; 
+    --primary-gradient:linear-gradient(135deg, #d4af37 0%, #b8941f 100%); /* Gradien emas */
+    --gold-accent: linear-gradient(45deg, #d4af37, #f0d78c, #d4af37); /* Aksen emas */
+    --gold-text: #b8941f; /* Teks emas */
+  }
+  *{ box-sizing:border-box; font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif }
+  body{ margin:0; background:var(--bg); color:var(--ink); line-height:1.6 }
+  
+  /* Layout Structure */
+  .app-container {
+    display: flex;
+    min-height: 100vh;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: var(--sidebar-width);
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    color: white;
+    padding: 24px 0;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    border-right: 3px solid var(--brand); /* Garis emas di sisi kanan sidebar */
+  }
+  
+  .sidebar-header {
+    padding: 0 24px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  
+  .logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  
+  .logo-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--brand);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); /* Bayangan emas */
+    border: 3px solid var(--brand-light);
+    overflow: hidden;
+  }
+  
+  .logo-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  
+  .logo-text {
+    font-size: 24px;
+    font-weight: 700;
+    background: var(--gold-accent);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0px 1px 2px rgba(0,0,0,0.2);
+    letter-spacing: 1px;
+  }
+  
+  .logo-subtitle {
+    font-size: 18px;
+    color: var(--brand-light);
+    margin-top: 5px;
+    font-weight: 600;
+    letter-spacing: 2px;
+  }
+  
+  .nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .nav-item {
+    margin-bottom: 4px;
+  }
+  
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 24px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .nav-link:hover {
+    background: rgba(212, 175, 55, 0.15); /* Latar belakang emas saat hover */
+    color: white;
+  }
+  
+  .nav-link.active {
+    background: rgba(212, 175, 55, 0.2);
+    color: white;
+  }
+  
+  .nav-link.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: var(--brand);
+  }
+  
+  .nav-icon {
+    width: 20px;
+    text-align: center;
+    color: var(--brand-light);
+  }
+  
+  /* Main Content */
+  .main-content {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Header */
+  .header {
+    height: var(--header-height);
+    background: white;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .page-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 12px;
+  }
+  
+  /* Content Area */
+  .content {
+    padding: 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  
+  /* Page Sections */
+  .page-section {
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+  
+  .page-section.active {
+    display: block;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Card Styles */
+  .card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    padding: 24px;
+    margin-bottom: 24px;
+    transition: all 0.3s ease;
+    border: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--primary-gradient);
+  }
+  
+  .card:hover {
+    box-shadow: var(--hover-shadow);
+    transform: translateY(-2px);
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  
+  .card-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--ink);
+  }
+  
+  .card-subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  
+  /* Button Styles */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  
+  .btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: 0 4px 8px rgba(212, 175, 55, 0.3);
+  }
+  
+  .btn-primary:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(212, 175, 55, 0.4);
+  }
+  
+  .btn-secondary {
+    background: white;
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  
+  .btn-secondary:hover {
+    background: var(--light-bg);
+    border-color: var(--brand);
+    color: var(--brand);
+  }
+  
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid transparent;
+  }
+  
+  .btn-ghost:hover {
+    background: rgba(212, 175, 55, 0.08);
+    color: var(--brand);
+  }
+  
+  .btn-sm {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 8px;
+  }
+  
+  /* Form Elements */
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background: white;
+  }
+  
+  .form-control:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+  }
+  
+  .form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23d4af37' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 40px;
+  }
+  
+  /* Grid System */
+  .grid {
+    display: grid;
+    gap: 24px;
+  }
+  
+  .grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
+  .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-cols-12 { grid-template-columns: repeat(12, 1fr); }
+  
+  .col-span-1 { grid-column: span 1; }
+  .col-span-2 { grid-column: span 2; }
+  .col-span-3 { grid-column: span 3; }
+  .col-span-4 { grid-column: span 4; }
+  .col-span-6 { grid-column: span 6; }
+  .col-span-8 { grid-column: span 8; }
+  .col-span-12 { grid-column: span 12; }
+  
+  /* KPI Cards */
+  .kpi-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--hover-shadow);
+  }
+  
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+  }
+  
+  .kpi-card.total::before { background: var(--brand); }
+  .kpi-card.due::before { background: var(--warn); }
+  .kpi-card.done::before { background: var(--ok); }
+  
+  .kpi-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .kpi-icon.total { background: rgba(212, 175, 55, 0.1); color: var(--brand); }
+  .kpi-icon.due { background: rgba(245, 158, 11, 0.1); color: var(--warn); }
+  .kpi-icon.done { background: rgba(22, 163, 74, 0.1); color: var(--ok); }
+  
+  .kpi-value {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    line-height: 1;
+  }
+  
+  .kpi-label {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  
+  /* Status Pills */
+  .status-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  
+  .status-pill.ok { background: rgba(22, 163, 74, 0.1); color: var(--ok); }
+  .status-pill.ok .status-dot { background: var(--ok); }
+  
+  .status-pill.warn { background: rgba(245, 158, 11, 0.1); color: var(--warn); }
+  .status-pill.warn .status-dot { background: var(--warn); }
+  
+  .status-pill.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+  .status-pill.danger .status-dot { background: var(--danger); }
+  
+  /* Table Styles */
+  .table-container {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .table th {
+    background: var(--light-bg);
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .table td {
+    padding: 16px;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+  }
+  
+  .table tr:hover {
+    background: rgba(212, 175, 55, 0.02);
+  }
+  .expense-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 13px;
+  }
+  .expense-list li {
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .expense-list li:last-child {
+    border-bottom: none;
+  }
+  
+  /* Progress Bar */
+  .progress {
+    height: 8px;
+    background: var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  
+  .progress-bar {
+    height: 100%;
+    background: var(--primary-gradient);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+  
+  /* Employee Selection */
+  .employee-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--light-bg);
+  }
+  
+  .employee-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .employee-card:hover {
+    border-color: var(--brand);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1);
+  }
+  
+  .employee-card.selected {
+    border-color: var(--brand);
+    background: rgba(212, 175, 55, 0.05);
+  }
+  
+  .employee-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  
+  .employee-checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--brand);
+  }
+  
+  .employee-name {
+    font-weight: 600;
+    font-size: 15px;
+  }
+  
+  .employee-role {
+    color: var(--muted);
+    font-size: 13px;
+    margin-left: 32px;
+  }
+  
+  .employee-email {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 4px;
+  }
+  
+  /* Kanban Board */
+  .kanban-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 24px;
+  }
+  
+  .kanban-column {
+    background: var(--light-bg);
+    border-radius: 12px;
+    padding: 16px;
+    min-height: 400px;
+  }
+  
+  .kanban-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  
+  .kanban-title {
+    font-weight: 600;
+    font-size: 16px;
+  }
+  
+  .kanban-count {
+    background: white;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .kanban-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .kanban-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+  }
+  
+  .kanban-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .kanban-card-title {
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  
+  .kanban-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  
+  .kanban-card-date {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  
+  .kanban-actions {
+    display: flex;
+    gap: 6px;
+  }
+  
+  /* Toast Notification */
+  .toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+  }
+  
+  .toast {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    max-width: 400px;
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+    border-left: 4px solid var(--ok);
+  }
+  
+  .toast.show {
+    transform: translateX(0);
+  }
+  
+  .toast-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  
+  .toast-success {
+    background: rgba(22, 163, 74, 0.1);
+    color: var(--ok);
+  }
+  
+  .toast-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+    border-left-color: var(--danger);
+  }
+  
+  .toast-content {
+    flex: 1;
+  }
+  
+  .toast-title {
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  
+  .toast-message {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  
+  /* Loading Spinner */
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Loading Section */
+  .loading-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+  }
+  
+  .loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(212, 175, 55, 0.1);
+    border-top-color: var(--brand);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+  }
+  
+  .loading-text {
+    font-size: 16px;
+    color: var(--muted);
+  }
+  
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .sidebar {
+      transform: translateX(-100%);
+    }
+    
+    .sidebar.active {
+      transform: translateX(0);
+    }
+    
+    .main-content {
+      margin-left: 0;
+    }
+    
+    .kanban-board {
+      grid-template-columns: 1fr;
+    }
+    
+    .grid-cols-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .header {
+      padding: 0 16px;
+    }
+    
+    .content {
+      padding: 16px;
+    }
+    
+    .card {
+      padding: 16px;
+    }
+    
+    .grid-cols-2, .grid-cols-3 {
+      grid-template-columns: 1fr;
+    }
+    
+    .employee-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+<script src="auth.js"></script>
+</head>
+<body>
+<div class="app-container">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <img src="logo.jpg" alt="Logo KSN" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <i class="fas fa-gem" style="display:none;"></i>
+        </div>
+        <div class="logo-text">KSN</div>
+        <div class="logo-subtitle">REMINDER KSN</div>
+      </div>
+    </div>
+    
+    <nav>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a class="nav-link active" data-section="dashboard">
+            <i class="fas fa-home nav-icon"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-section="assign">
+            <i class="fas fa-user-plus nav-icon"></i>
+            <span>Assign Project</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-section="employees">
+            <i class="fas fa-id-card nav-icon"></i>
+            <span>Employees</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-section="reminders">
+            <i class="fas fa-bell nav-icon"></i>
+            <span>Reminders</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-section="schedule">
+            <i class="fas fa-calendar-alt nav-icon"></i>
+            <span>Schedule</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-section="meetings">
+            <i class="fas fa-users nav-icon"></i>
+            <span>Meetings</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-section="budget">
+            <i class="fas fa-money-bill-wave nav-icon"></i>
+            <span>Budget</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" data-section="kanban">
+            <i class="fas fa-columns nav-icon"></i>
+            <span>Kanban Board</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-section="notes">
+            <i class="fas fa-sticky-note nav-icon"></i>
+            <span>Notes</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-section="pengajuan">
+            <i class="fas fa-folder-open nav-icon"></i>
+            <span>Pengajuan Proyek</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+  
+  <div class="main-content">
+    <header class="header">
+      <div class="page-title">
+        <i class="fas fa-home" id="page-icon"></i>
+        <span id="page-title-text">Dashboard</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-icon" id="menu-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <button class="btn btn-secondary btn-sm" id="btn-logout">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </header>
+    
+    <main class="content">
+      <div id="dashboard" class="page-section active">
+        <div class="grid grid-cols-3">
+          <div class="kpi-card total">
+            <div class="kpi-icon total">
+              <i class="fas fa-tasks"></i>
+            </div>
+            <div class="kpi-value" id="kpi-total">0</div>
+            <div class="kpi-label">Total Tasks</div>
+          </div>
+          <div class="kpi-card due">
+            <div class="kpi-icon due">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="kpi-value" id="kpi-due">0</div>
+            <div class="kpi-label">Due (H & H-1)</div>
+          </div>
+          <div class="kpi-card done">
+            <div class="kpi-icon done">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="kpi-value" id="kpi-done">0</div>
+            <div class="kpi-label">Completed</div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Status Overview</h3>
+              <p class="card-subtitle">Project status distribution</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="btn-refresh-dashboard">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+          </div>
+          <div class="status-pills" id="status-overview">
+            </div>
+        </div>
+      </div>
+      
+      <div id="assign" class="page-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Assign New Project</h3>
+            <p class="card-subtitle">Create a new project and assign to employees</p>
+          </div>
+          
+          <div class="grid grid-cols-12">
+            <div class="col-span-6">
+              <div class="form-group">
+                <label class="form-label">Project Name</label>
+                <input type="text" class="form-control" id="as-project" placeholder="e.g., Website Redesign">
+              </div>
+            </div>
+            <div class="col-span-3">
+              <div class="form-group">
+                <label class="form-label">Deadline</label>
+                <input type="date" class="form-control" id="as-deadline">
+              </div>
+            </div>
+            <div class="col-span-3">
+              <div class="form-group">
+                <label class="form-label">Priority</label>
+                <select class="form-control form-select" id="as-priority">
+                  <option value="low">Low</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-span-12">
+              <div class="form-group">
+                <label class="form-label">Select Employees</label>
+                <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                  <button class="btn btn-secondary btn-sm" id="btn-load-emp">
+                    <i class="fas fa-users"></i> Load Employees
+                  </button>
+                  <button class="btn btn-ghost btn-sm" id="btn-select-all-assign">
+                    <i class="fas fa-check-square"></i> Select All
+                  </button>
+                  <button class="btn btn-ghost btn-sm" id="btn-clear-all-assign">
+                    <i class="fas fa-square"></i> Clear All
+                  </button>
+                </div>
+                <div class="employee-grid" id="employee-list">
+                  </div>
+              </div>
+            </div>
+            <div class="col-span-12">
+              <button class="btn btn-primary" id="btn-assign">
+                <i class="fas fa-check-circle"></i> Assign Project
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="employees" class="page-section">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Manage Employees</h3>
+              <p class="card-subtitle">Add / update / delete employees</p>
+            </div>
+            <div style="display:flex; gap:12px;">
+              <button class="btn btn-secondary btn-sm" id="btn-load-emp-mgr">
+                <i class="fas fa-sync-alt"></i> Load
+              </button>
+            </div>
+          </div>
+          <div class="grid grid-cols-12">
+            <div class="col-span-3">
+              <div class="form-group"><label class="form-label">NPK</label><input class="form-control" id="em-npk"></div>
+            </div>
+            <div class="col-span-3">
+              <div class="form-group"><label class="form-label">Nama</label><input class="form-control" id="em-nama"></div>
+            </div>
+            <div class="col-span-3">
+              <div class="form-group"><label class="form-label">Email</label><input class="form-control" id="em-email"></div>
+            </div>
+            <div class="col-span-2">
+              <div class="form-group"><label class="form-label">Divisi</label><input class="form-control" id="em-divisi"></div>
+            </div>
+            <div class="col-span-1">
+              <div class="form-group"><label class="form-label">Role</label><input class="form-control" id="em-role"></div>
+            </div>
+            <div class="col-span-12">
+              <button class="btn btn-primary" id="btn-save-emp"><i class="fas fa-save"></i> Save / Update</button>
+              <button class="btn btn-ghost" id="btn-clear-emp"><i class="fas fa-eraser"></i> Clear</button>
+            </div>
+          </div>
+        </div>
+      
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Employees List</h3>
+            <p class="card-subtitle">Click delete to remove</p>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>NPK</th><th>Nama</th><th>Email</th><th>Divisi</th><th>Role</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tbl-emp"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <div id="reminders" class="page-section">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Project Reminders</h3>
+              <p class="card-subtitle">Manage and send project reminders</p>
+            </div>
+            <div style="display: flex; gap: 12px;">
+              <button class="btn btn-secondary btn-sm" id="btn-load-rem">
+                <i class="fas fa-sync-alt"></i> Load
+              </button>
+              <button class="btn btn-primary btn-sm" id="btn-send-bulk">
+                <i class="fas fa-paper-plane"></i> Send Bulk
+              </button>
+            </div>
+          </div>
+          
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Email</th>
+                  <th>Project</th>
+                  <th>Deadline</th>
+                  <th>Priority</th>
+                  <th>Progress</th>
+                  <th>Status</th>
+                  <th>Submission</th> <th>Actions</th>
+                </tr></thead>
+              <tbody id="tbl-rem">
+                </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Update Progress</h3>
+            <p class="card-subtitle">Update project progress and add notes</p>
+          </div>
+          
+          <div class="grid grid-cols-12">
+            <div class="col-span-4">
+              <div class="form-group">
+                <label class="form-label">Employee</label>
+                <select class="form-control form-select" id="up-employee">
+                  <option value="">-- Select Employee --</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-span-4">
+              <div class="form-group">
+                <label class="form-label">Project</label>
+                <select class="form-control form-select" id="up-project">
+                  <option value="">-- Select Project --</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-span-2">
+              <div class="form-group">
+                <label class="form-label">Progress (%)</label>
+                <input type="number" class="form-control" id="up-progress" min="0" max="100" value="50">
+              </div>
+            </div>
+            <div class="col-span-2">
+              <div class="form-group">
+                <label class="form-label">&nbsp;</label>
+                <button class="btn btn-primary" id="btn-update-progress" style="width: 100%;">
+                  <i class="fas fa-save"></i> Update
+                </button>
+              </div>
+            </div>
+            <div class="col-span-6">
+              <div class="form-group">
+                <label class="form-label">Notes</label>
+                <input type="text" class="form-control" id="up-notes" placeholder="Progress notes...">
+              </div>
+            </div>
+            <div class="col-span-6">
+              <div class="form-group">
+                <label class="form-label">Submission Link</label>
+                <input type="text" class="form-control" id="up-link" placeholder="https://...">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="schedule" class="page-section">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Reminder Schedule</h3>
+              <p class="card-subtitle">Configure automatic reminder schedule</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="btn-load-schedule">
+              <i class="fas fa-sync-alt"></i> Get Schedule
+            </button>
+          </div>
+          
+          <div class="grid grid-cols-12">
+            <div class="col-span-4">
+              <div class="form-group">
+                <label class="form-label">Daily Send Time</label>
+                <input type="number" class="form-control" id="sc-hour" min="0" max="23" value="8">
+                <small class="text-muted">Hour (0-23)</small>
+              </div>
+            </div>
+            <div class="col-span-4">
+              <div class="form-group">
+                <label class="form-label">Include Weekends?</label>
+                <select class="form-control form-select" id="sc-weekend">
+                  <option value="false">No</option>
+                  <option value="true">Yes</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-span-4">
+              <div class="form-group">
+                <label class="form-label">&nbsp;</label>
+                <button class="btn btn-primary" id="btn-save-schedule" style="width: 100%;">
+                  <i class="fas fa-save"></i> Save Schedule
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="meetings" class="page-section">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Create New Meeting</h3>
+              <p class="card-subtitle">Schedule a meeting and invite participants</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="btn-load-meet">
+              <i class="fas fa-sync-alt"></i> Load Meetings
+            </button>
+          </div>
+          
+          <div class="grid grid-cols-12">
+            <div class="col-span-4">
+              <div class="form-group">
+                <label class="form-label">Meeting Title</label>
+                <input type="text" class="form-control" id="m-title" placeholder="e.g., Weekly Standup">
+              </div>
+            </div>
+            <div class="col-span-4">
+              <div class="form-group">
+                <label class="form-label">Date & Time</label>
+                <input type="datetime-local" class="form-control" id="m-dt">
+              </div>
+            </div>
+            <div class="col-span-2">
+              <div class="form-group">
+                <label class="form-label">Duration (min)</label>
+                <input type="number" class="form-control" id="m-dur" value="60">
+              </div>
+            </div>
+            <div class="col-span-2">
+              <div class="form-group">
+                <label class="form-label">Location</label>
+                <input type="text" class="form-control" id="m-loc" placeholder="Zoom/Room">
+              </div>
+            </div>
+            <div class="col-span-12">
+              <div class="form-group">
+                <label class="form-label">Description</label>
+                <input type="text" class="form-control" id="m-desc" placeholder="Meeting description...">
+              </div>
+            </div>
+            <div class="col-span-12">
+              <div class="form-group">
+                <label class="form-label">Select Participants</label>
+                <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                  <button class="btn btn-secondary btn-sm" id="btn-load-emp-meet">
+                    <i class="fas fa-users"></i> Load Employees
+                  </button>
+                  <button class="btn btn-ghost btn-sm" id="btn-select-all-meet">
+                    <i class="fas fa-check-square"></i> Select All
+                  </button>
+                  <button class="btn btn-ghost btn-sm" id="btn-clear-all-meet">
+                    <i class="fas fa-square"></i> Clear All
+                  </button>
+                </div>
+                <div class="employee-grid" id="employee-list-meet">
+                  </div>
+              </div>
+            </div>
+            <div class="col-span-12">
+              <button class="btn btn-primary" id="btn-add-meet">
+                <i class="fas fa-plus-circle"></i> Create Meeting
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Scheduled Meetings</h3>
+            <p class="card-subtitle">List of all upcoming meetings</p>
+          </div>
+          
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Date & Time</th>
+                  <th>Duration</th>
+                  <th>Location</th>
+                  <th>Participants</th>
+                </tr>
+              </thead>
+              <tbody id="tbl-meet">
+                </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <div id="budget" class="page-section">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Project Budget</h3>
+              <p class="card-subtitle">Budget ditarik otomatis dari pengajuan yang disetujui. Tidak ada input manual.</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="btn-load-budget">
+              <i class="fas fa-sync-alt"></i> Load Budgets
+            </button>
+          </div>
+          
+          <div class="grid grid-cols-12">
+            <div class="col-span-4">
+              <div class="form-group">
+                <label class="form-label">Project Name</label>
+                <input type="text" class="form-control" id="b-project" placeholder="Project name">
+              </div>
+            </div>
+            <div class="col-span-4">
+              <div class="form-group">
+                <label class="form-label">Budget Amount</label>
+                <input type="number" class="form-control" id="b-amount" placeholder="0">
+              </div>
+            </div>
+            <div class="col-span-4">
+              <div class="form-group">
+                <label class="form-label">Period</label>
+                <input type="text" class="form-control" id="b-period" placeholder="e.g., 2023-Q3">
+              </div>
+            </div>
+            <div class="col-span-12">
+              <button class="btn btn-primary" id="btn-add-budget" style="display:none">
+                <i class="fas fa-plus-circle"></i> Add Budget
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Budget List</h3>
+            <p class="card-subtitle">All project budgets</p>
+          </div>
+          
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Project</th>
+                  <th>Uang Muka</th>
+                  <th>Period</th>
+                  <th>Penggunaan Uang</th>
+                  <th>Sisa Uang</th>
+                </tr>
+              </thead>
+              <tbody id="tbl-budget">
+                </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      
+      <div id="kanban" class="page-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Kanban (otomatis dari progress)</h3>
+            <button class="btn btn-secondary btn-sm" id="btn-load-kanban">
+              <i class="fas fa-sync"></i> Muat
+            </button>
+          </div>
+          <div style="font-size:13px;color:var(--muted);margin-top:-8px;margin-bottom:8px">
+            To Do = 0% · Doing = 1–99% · Done = 100%
+          </div>
+          <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
+            <label for="kanban-employee" class="form-label" style="margin:0;">Filter Karyawan</label>
+            <select id="kanban-employee" class="form-control form-select" style="max-width:320px;">
+              <option value="">— Semua Karyawan (Gabungan) —</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" id="btn-refresh-kanban">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+          </div>
+        </div>
+        <div class="grid grid-cols-12">
+          <div class="col-span-4">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">To Do</h3>
+                <span id="k-todo-count">0</span>
+              </div>
+              <div id="k-todo"></div>
+            </div>
+          </div>
+          <div class="col-span-4">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Doing</h3>
+                <span id="k-doing-count">0</span>
+              </div>
+              <div id="k-doing"></div>
+            </div>
+          </div>
+          <div class="col-span-4">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Done</h3>
+                <span id="k-done-count">0</span>
+              </div>
+              <div id="k-done"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="notes" class="page-section">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Meeting Notes</h3>
+              <p class="card-subtitle">Save and manage your meeting notes</p>
+            </div>
+            <div style="display: flex; gap: 12px;">
+              <button class="btn btn-secondary btn-sm" id="btn-load-notes">
+                <i class="fas fa-folder-open"></i> Load
+              </button>
+              <button class="btn btn-primary btn-sm" id="btn-save-notes">
+                <i class="fas fa-save"></i> Save
+              </button>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <textarea class="form-control" id="notes-area" rows="15" placeholder="Enter your meeting notes here..."></textarea>
+          </div>
+        </div>
+      </div>
+      
+      <div id="pengajuan" class="page-section">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Daftar Pengajuan Proyek</h3>
+            <button class="btn btn-secondary btn-sm" id="btn-refresh-pengajuan">
+              <i class="fas fa-sync-alt"></i> Muat Ulang
+            </button>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Judul</th>
+                  <th>Deskripsi</th>
+                  <th>Biaya</th>
+                  <th>Pemohon</th>
+                  <th>Status</th>
+                  <th style="width:180px">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tbl-pengajuan">
+                <tr><td colspan="6" style="padding:16px;color:var(--muted)">Belum ada data</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div class="toast-container" id="toast-container"></div>
+<script>
+// ====== API BASE (paksa ke endpoint baru) ======
+const API_BASE = 'https://script.google.com/macros/s/AKfycbwVgPZ9TnMDG-5h3vUy8e8YG-n9cTT2U73PNdzOXjPLWQRVeoiljRWSGx3nheMDuV33Sw/exec';
+// Bridge standar ke Apps Script
+async function api(fn, data) {
+  const body = new URLSearchParams({
+    function: fn,
+    data: JSON.stringify(data || {})
+  });
+  const res = await fetch(API_BASE, { method:'POST', body });
+  const json = await res.json().catch(()=>({ ok:false, error:'Response tidak valid' }));
+  return json;
+}
+// Helper panggilan dengan token login
+const getToken = () => (readAnySession()?.token || '');
+async function call(fn, payload = {}) {
+  const res = await api(fn, Object.assign({ token: getToken() }, payload || {}));
+  if(!res?.ok) throw new Error(res?.error || 'Error');
+  return res.data;
+}
+// Page navigation
+const pageLinks = document.querySelectorAll('.nav-link');
+const pageSections = document.querySelectorAll('.page-section');
+const pageTitle = document.getElementById('page-title-text');
+const pageIcon = document.getElementById('page-icon');
+// Page icons mapping
+const pageIcons = {
+  'dashboard': 'fas fa-home',
+  'assign': 'fas fa-user-plus',
+  'employees': 'fas fa-id-card',
+  'reminders': 'fas fa-bell',
+  'schedule': 'fas fa-calendar-alt',
+  'meetings': 'fas fa-users',
+  'budget': 'fas fa-money-bill-wave',
+  'expense': 'fas fa-receipt',
+  'kanban': 'fas fa-columns',
+  'notes': 'fas fa-sticky-note',
+  'pengajuan': 'fas fa-folder-open'
+};
+// Page title mapping
+const pageTitles = {
+  'dashboard': 'Dashboard',
+  'assign': 'Assign Project',
+  'employees': 'Employees',
+  'reminders': 'Project Reminders',
+  'schedule': 'Reminder Schedule',
+  'meetings': 'Meetings',
+  'budget': 'Project Budget',
+  'expense': 'Project Expenses',
+  'kanban': 'Kanban Board',
+  'notes': 'Meeting Notes',
+  'pengajuan': 'Pengajuan Proyek'
+};
+// Navigation event listeners
+pageLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const targetSection = link.dataset.section;
+    
+    // Update active nav link
+    pageLinks.forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+    
+    // Show target section with animation
+    pageSections.forEach(section => {
+      section.classList.remove('active');
+    });
+    
+    setTimeout(() => {
+      document.getElementById(targetSection).classList.add('active');
+    }, 100);
+    
+    // Update page title and icon
+    pageTitle.textContent = pageTitles[targetSection];
+    pageIcon.className = pageIcons[targetSection];
+    
+    // Load page data if needed
+    if (targetSection === 'dashboard') {
+      loadDashboard();
+    } else if (targetSection === 'employees') {
+      loadEmployeesManage();
+    } else if (targetSection === 'reminders') {
+      loadReminders();
+      loadUpdateProgressDropdowns();
+    } else if (targetSection === 'meetings') {
+      loadMeetings();
+    } else if (targetSection === 'budget') {
+      loadApprovedBudgets();
+    } else if (targetSection === 'kanban') {
+      loadEmployeesForKanban();
+      loadKanban();
+    } else if (targetSection === 'notes') {
+      loadNotes();
+    } else if (targetSection === 'pengajuan') {
+      loadPengajuan();
+    }
+  });
+});
+// Mobile menu toggle
+document.getElementById('menu-toggle').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('active');
+});
+// Toast notification function
+function showToast(message, type = 'success') {
+  const toastContainer = document.getElementById('toast-container');
+  
+  const toast = document.createElement('div');
+  toast.className = `toast ${type === 'error' ? 'toast-error' : 'toast-success'}`;
+  
+  const iconClass = type === 'error' ? 'fas fa-times-circle' : 'fas fa-check-circle';
+  
+  toast.innerHTML = `
+    <div class="toast-icon ${type === 'error' ? 'toast-error' : 'toast-success'}">
+      <i class="${iconClass}"></i>
+    </div>
+    <div class="toast-content">
+      <div class="toast-title">${type === 'error' ? 'Error' : 'Success'}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+  `;
+  
+  toastContainer.appendChild(toast);
+  
+  // Show toast
+  setTimeout(() => {
+    toast.classList.add('show');
+  }, 10);
+  
+  // Hide and remove toast
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => {
+      toastContainer.removeChild(toast);
+    }, 300);
+  }, 3000);
+}
+// Escape HTML function
+function esc(x) {
+  return (x ?? '').toString().replace(/[&<>"']/g, m => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[m]));
+}
+// Tambahkan helper untuk membuat link aman
+function makeLink(href) {
+  const url = (href || '').toString().trim();
+  if (!url) return '';
+  const safe = url.startsWith('http://') || url.startsWith('https://') ? url : `https://${url}`;
+  const label = safe.replace(/^https?:\/\//,'');
+  return `<a href="${esc(safe)}" target="_blank" rel="noopener noreferrer">${esc(label)}</a>`;
+}
+// Update employee selection visual
+function updateEmployeeSelection(card, isSelected) {
+  if (isSelected) {
+    card.classList.add('selected');
+  } else {
+    card.classList.remove('selected');
+  }
+}
+// ================== Dashboard ==================
+async function loadDashboard() {
+  try {
+    const d = await call('getDashboardData', {});
+    
+    // Update KPI cards
+    document.getElementById('kpi-total').textContent = d.kpi.total || 0;
+    document.getElementById('kpi-due').textContent = d.kpi.dueCount || 0;
+    document.getElementById('kpi-done').textContent = d.kpi.completed || 0;
+    
+    // Update status pills
+    const statusContainer = document.getElementById('status-overview');
+    statusContainer.innerHTML = '';
+    
+    Object.entries(d.statusMap || {}).forEach(([status, count]) => {
+      const pill = document.createElement('div');
+      pill.className = 'status-pill';
+      
+      // Determine pill type based on status
+      if (status.toLowerCase().includes('done') || status.toLowerCase().includes('complete')) {
+        pill.classList.add('ok');
+      } else if (status.toLowerCase().includes('warning') || status.toLowerCase().includes('pending')) {
+        pill.classList.add('warn');
+      } else if (status.toLowerCase().includes('overdue') || status.toLowerCase().includes('danger')) {
+        pill.classList.add('danger');
+      }
+      
+      pill.innerHTML = `
+        <span class="status-dot"></span>
+        <span>${status}: ${count}</span>
+      `;
+      
+      statusContainer.appendChild(pill);
+    });
+  } catch (error) {
+    showToast(error.message, 'error');
+  }
+}
+document.getElementById('btn-refresh-dashboard').addEventListener('click', loadDashboard);
+// ================== Employees & Assign ==================
+async function loadEmployees() {
+  const box = document.getElementById('employee-list');
+  box.innerHTML = '<div class="col-span-12"><div class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Loading employees...</div></div>';
+  
+  try {
+    const list = await call('listEmployees', {});
+    
+    if (!list.length) {
+      box.innerHTML = '<div class="col-span-12"><div class="text-center py-4 text-muted">No employees found</div></div>';
+      return;
+    }
+    
+    box.innerHTML = '';
+    
+    list.forEach((employee, index) => {
+      const card = document.createElement('div');
+      card.className = 'col-span-12';
+      
+      card.innerHTML = `
+        <div class="employee-card" data-emp="${index}">
+          <div class="employee-header">
+            <input type="checkbox" class="employee-checkbox" data-emp="${index}" data-email="${esc(employee.EMAIL)}" data-name="${esc(employee.NAMA)}">
+            <div class="employee-name">${esc(employee.NAMA || '-')}</div>
+          </div>
+          <div class="employee-role">${esc(employee.ROLE || '')}</div>
+          <div class="employee-email">${esc(employee.EMAIL || '')}</div>
+        </div>
+      `;
+      
+      box.appendChild(card);
+      
+      // Add event listeners
+      const employeeCard = card.querySelector('.employee-card');
+      const checkbox = card.querySelector('.employee-checkbox');
+      
+      employeeCard.addEventListener('click', (event) => {
+        if (event.target.type !== 'checkbox') {
+          checkbox.checked = !checkbox.checked;
+        }
+        updateEmployeeSelection(employeeCard, checkbox.checked);
+      });
+      
+      checkbox.addEventListener('change', () => {
+          updateEmployeeSelection(employeeCard, checkbox.checked);
+      });
+    });
+    
+    // Store employee data
+    box.dataset.payload = JSON.stringify(list);
+  } catch (error) {
+    box.innerHTML = `<div class="col-span-12"><div class="text-center py-4 text-danger">Error: ${error.message}</div></div>`;
+  }
+}
+// Select all employees for assignment
+document.getElementById('btn-select-all-assign').addEventListener('click', () => {
+  const checkboxes = document.querySelectorAll('#employee-list input[type="checkbox"]');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = true;
+    const card = checkbox.closest('.employee-card');
+    updateEmployeeSelection(card, true);
+  });
+});
+// Clear all selections for assignment
+document.getElementById('btn-clear-all-assign').addEventListener('click', () => {
+  const checkboxes = document.querySelectorAll('#employee-list input[type="checkbox"]');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = false;
+    const card = checkbox.closest('.employee-card');
+    updateEmployeeSelection(card, false);
+  });
+});
+document.getElementById('btn-load-emp').addEventListener('click', loadEmployees);
+document.getElementById('btn-assign').addEventListener('click', async () => {
+  try {
+    const projectName = document.getElementById('as-project').value.trim();
+    const deadline = document.getElementById('as-deadline').value;
+    const priority = document.getElementById('as-priority').value;
+    
+    if (!projectName || !deadline) {
+      showToast('Please fill in project name and deadline', 'error');
+      return;
+    }
+    
+    const list = JSON.parse(document.getElementById('employee-list').dataset.payload || '[]');
+    const checkboxes = document.querySelectorAll('#employee-list input[type="checkbox"]:checked');
+    
+    if (!checkboxes.length) {
+      showToast('Please select at least one employee', 'error');
+      return;
+    }
+    
+    const assignees = Array.from(checkboxes).map(cb => list[Number(cb.dataset.emp)]);
+    
+    await call('assignProject', { projectName, deadline, priority, assignees });
+    showToast('Project assigned successfully');
+    
+    // Reset form
+    document.getElementById('as-project').value = '';
+    document.getElementById('as-deadline').value = '';
+    document.getElementById('as-priority').value = 'medium';
+    checkboxes.forEach(cb => {
+      cb.checked = false;
+      const card = cb.closest('.employee-card');
+      updateEmployeeSelection(card, false);
+    });
+  } catch (error) {
+    showToast(error.message, 'error');
+  }
+});
+/* ================== Employees Manage ================== */
+async function loadEmployeesManage(){
+  const tb = document.getElementById('tbl-emp');
+  tb.innerHTML = '<tr><td colspan="6"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+  try{
+    const list = await call('listEmployees', {});
+    if(!list.length){
+      tb.innerHTML = '<tr><td colspan="6" class="text-center py-3">No employees</td></tr>';
+      return;
+    }
+    tb.innerHTML = list.map(e => `
+      <tr>
+        <td>${esc(e.NPK||'')}</td>
+        <td>${esc(e.NAMA||'')}</td>
+        <td>${esc(e.EMAIL||'')}</td>
+        <td>${esc(e.DIVISI||'')}</td>
+        <td>${esc(e.ROLE||'')}</td>
+        <td>
+          <button class="btn btn-sm btn-secondary" data-fill='${esc(JSON.stringify(e))}'>
+            <i class="fas fa-pen"></i> Edit
+          </button>
+          <button class="btn btn-sm btn-danger" data-del='${esc(JSON.stringify({npk:e.NPK||'', email:e.EMAIL||''}))}'>
+            <i class="fas fa-trash"></i> Delete
+          </button>
+        </td>
+      </tr>
+    `).join('');
+    
+    // isi form dari baris (Edit)
+    tb.querySelectorAll('[data-fill]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const d = JSON.parse(b.getAttribute('data-fill'));
+        document.getElementById('em-npk').value = d.NPK||'';
+        document.getElementById('em-nama').value = d.NAMA||'';
+        document.getElementById('em-email').value = d.EMAIL||'';
+        document.getElementById('em-divisi').value = d.DIVISI||'';
+        document.getElementById('em-role').value = d.ROLE||'';
+      });
+    });
+    // hapus karyawan
+    tb.querySelectorAll('[data-del]').forEach(b=>{
+      b.addEventListener('click', async ()=>{
+        try{
+          const d = JSON.parse(b.getAttribute('data-del'));
+          if(!d.npk && !d.email) return showToast('NPK/Email kosong','error');
+          if(!confirm('Hapus karyawan ini?')) return;
+          const r = await call('deleteEmployee', d);
+          showToast(`Deleted: ${r.deleted||0}`);
+          loadEmployeesManage();
+        }catch(e){ showToast(e.message, 'error'); }
+      });
+    });
+  }catch(e){
+    tb.innerHTML = `<tr><td colspan="6" class="text-danger">Error: ${e.message}</td></tr>`;
+  }
+}
+document.getElementById('btn-load-emp-mgr').addEventListener('click', loadEmployeesManage);
+document.getElementById('btn-save-emp').addEventListener('click', async ()=>{
+  try{
+    const npk   = document.getElementById('em-npk').value.trim();
+    const nama  = document.getElementById('em-nama').value.trim();
+    const email = document.getElementById('em-email').value.trim();
+    const divisi= document.getElementById('em-divisi').value.trim();
+    const role  = document.getElementById('em-role').value.trim();
+    if(!npk && !email) return showToast('Isi minimal NPK atau Email','error');
+    await call('upsertEmployee', { npk, nama, email, divisi, role });
+    showToast('Saved');
+    document.getElementById('btn-clear-emp').click();
+    loadEmployeesManage();
+  }catch(e){ showToast(e.message, 'error'); }
+});
+document.getElementById('btn-clear-emp').addEventListener('click', ()=>{
+  ['em-npk','em-nama','em-email','em-divisi','em-role'].forEach(id=> document.getElementById(id).value='');
+});
+// ================== Reminders ==================
+async function loadReminders() {
+  const tbody = document.getElementById('tbl-rem');
+  tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Loading reminders...</td></tr>';
+  
+  try {
+    const rows = await call('listReminders', {});
+    
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-muted">No reminders found</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = rows.map(reminder => `
+      <tr>
+        <td><strong>${esc(reminder.NAMA)}</strong></td>
+        <td>${esc(reminder.EMAIL)}</td>
+        <td>${esc(reminder.PROJECT)}</td>
+        <td>${esc(reminder.DEADLINE)}</td>
+        <td>${esc(reminder.PRIORITY)}</td>
+        <td>
+          <div>${Number(reminder.PROGRESS || 0)}%</div>
+          <div class="progress"><div class="progress-bar" style="width:${Number(reminder.PROGRESS||0)}%"></div></div>
+        </td>
+        <td>${Number(reminder.PROGRESS||0) >= 100 ? '<span class="status-pill ok"><span class="status-dot"></span> DONE</span>' : '<span class="status-pill warn"><span class="status-dot"></span> OPEN</span>'}</td>
+        <td>${makeLink(reminder.SUBMISSION_LINK || '')}</td> <td style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-primary" data-send='${esc(JSON.stringify({
+            email: reminder.EMAIL, nama: reminder.NAMA, project: reminder.PROJECT,
+            deadline: reminder.DEADLINE, priority: reminder.PRIORITY, progress: reminder.PROGRESS
+          }))}'><i class="fas fa-envelope"></i> Send</button>
+          <button class="btn btn-sm btn-secondary" data-del-proj='${esc(JSON.stringify({
+            project: reminder.PROJECT, emailOrNpk: reminder.EMAIL || reminder.NPK || reminder.NAMA
+          }))}'><i class="fas fa-trash"></i> Delete</button>
+        </td>
+      </tr>
+    `).join('');
+    
+    // Add event listeners to send buttons
+    tbody.querySelectorAll('[data-send]').forEach(button => {
+      button.addEventListener('click', async () => {
+        try {
+          const payload = JSON.parse(button.getAttribute('data-send'));
+          if (!payload.email) {
+            showToast('Email is empty', 'error');
+            return;
+          }
+          
+          await call('sendReminder', payload);
+          showToast('Reminder sent successfully');
+        } catch (error) {
+          showToast(error.message, 'error');
+        }
+      });
+    });
+    
+    // setelah render tbody reminders:
+    tbody.querySelectorAll('[data-del-proj]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        try{
+          const p = JSON.parse(btn.getAttribute('data-del-proj'));
+          if(!p.project) return showToast('Project kosong', 'error');
+          if(!confirm(`Hapus assignment project "${p.project}" untuk orang ini?`)) return;
+          const r = await call('deleteProject', p);
+          showToast(`Deleted: ${r.deleted||0}`);
+          loadReminders();
+          loadDashboard();
+        }catch(e){ showToast(e.message, 'error'); }
+      });
+    });
+  } catch (error) {
+    tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-danger">Error: ${error.message}</td></tr>`;
+  }
+}
+document.getElementById('btn-load-rem').addEventListener('click', loadReminders);
+document.getElementById('btn-send-bulk').addEventListener('click', async () => {
+  try {
+    const result = await call('sendBulkReminders', {});
+    showToast(`Bulk reminders sent: ${result.sent || 0}`);
+  } catch (error) {
+    showToast(error.message, 'error');
+  }
+});
+// New function to load dropdowns for Update Progress
+async function loadUpdateProgressDropdowns() {
+    try {
+        const reminders = await call('listReminders', {});
+        
+        const employeeSelect = document.getElementById('up-employee');
+        const projectSelect = document.getElementById('up-project');
+        
+        employeeSelect.innerHTML = '<option value="">-- Select Employee --</option>';
+        projectSelect.innerHTML = '<option value="">-- Select Project --</option>';
+        
+        const uniqueEmployees = new Set();
+        const uniqueProjects = new Set();
+        
+        reminders.forEach(r => {
+            if (r.NAMA) uniqueEmployees.add(r.NAMA);
+            if (r.PROJECT) uniqueProjects.add(r.PROJECT);
+        });
+        
+        Array.from(uniqueEmployees).sort().forEach(empName => {
+            const option = document.createElement('option');
+            option.value = empName;
+            option.textContent = empName;
+            employeeSelect.appendChild(option);
+        });
+        
+        Array.from(uniqueProjects).sort().forEach(projName => {
+            const option = document.createElement('option');
+            option.value = projName;
+            option.textContent = projName;
+            projectSelect.appendChild(option);
+        });
+    } catch (e) {
+        showToast('Failed to load employee/project lists.', 'error');
+    }
+}
+
+document.getElementById('btn-update-progress').addEventListener('click', async () => {
+  try {
+    const employee = document.getElementById('up-employee').value;
+    const project = document.getElementById('up-project').value;
+    const progress = Number(document.getElementById('up-progress').value || 0);
+    const notes = document.getElementById('up-notes').value;
+    const link = document.getElementById('up-link').value;
+    
+    if (!employee || !project) {
+      showToast('Please select an employee and project.', 'error');
+      return;
+    }
+    
+    await call('updateProgress', { 
+      emailOrNpk: employee, 
+      project, 
+      progress, 
+      notes, 
+      link, 
+      updatedBy: 'web' 
+    });
+    
+    showToast('Progress updated successfully');
+    loadReminders();
+    loadDashboard();
+    loadKanban();
+  } catch (error) {
+    showToast(error.message, 'error');
+  }
+});
+// ================== Schedule ==================
+document.getElementById('btn-save-schedule').addEventListener('click', async () => {
+  try {
+    const hour = Number(document.getElementById('sc-hour').value || 8);
+    const weekend = document.getElementById('sc-weekend').value === 'true';
+    
+    await call('setSchedule', { hour, weekend });
+    showToast('Schedule saved and trigger created');
+  } catch (error) {
+    showToast(error.message, 'error');
+  }
+});
+document.getElementById('btn-load-schedule').addEventListener('click', async () => {
+  try {
+    const config = await call('getSchedule', {});
+    document.getElementById('sc-hour').value = config.hour ?? 8;
+    document.getElementById('sc-weekend').value = String(!!config.weekend);
+    showToast('Schedule loaded');
+  } catch (error) {
+    showToast(error.message, 'error');
+  }
+});
+// ================== Meetings ==================
+// Load employees for meeting participants
+async function loadEmployeesForMeeting() {
+  const box = document.getElementById('employee-list-meet');
+  box.innerHTML = '<div class="col-span-12"><div class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Loading employees...</div></div>';
+  
+  try {
+    const list = await call('listEmployees', {});
+    
+    if (!list.length) {
+      box.innerHTML = '<div class="col-span-12"><div class="text-center py-4 text-muted">No employees found</div></div>';
+      return;
+    }
+    
+    box.innerHTML = '';
+    
+    list.forEach((employee, index) => {
+      const card = document.createElement('div');
+      card.className = 'col-span-12';
+      
+      card.innerHTML = `
+        <div class="employee-card" data-emp="${index}">
+          <div class="employee-header">
+            <input type="checkbox" class="employee-checkbox" data-emp="${index}" data-email="${esc(employee.EMAIL)}" data-name="${esc(employee.NAMA)}">
+            <div class="employee-name">${esc(employee.NAMA || '-')}</div>
+          </div>
+          <div class="employee-role">${esc(employee.ROLE || '')}</div>
+          <div class="employee-email">${esc(employee.EMAIL || '')}</div>
+        </div>
+      `;
+      
+      box.appendChild(card);
+      
+      // Add event listeners
+      const employeeCard = card.querySelector('.employee-card');
+      const checkbox = card.querySelector('.employee-checkbox');
+      
+      employeeCard.addEventListener('click', (event) => {
+        if (event.target.type !== 'checkbox') {
+          checkbox.checked = !checkbox.checked;
+        }
+        updateEmployeeSelection(employeeCard, checkbox.checked);
+      });
+      
+      checkbox.addEventListener('change', () => {
+        updateEmployeeSelection(employeeCard, checkbox.checked);
+      });
+    });
+    
+    // Store employee data
+    box.dataset.payload = JSON.stringify(list);
+  } catch (error) {
+    box.innerHTML = `<div class="col-span-12"><div class="text-center py-4 text-danger">Error: ${error.message}</div></div>`;
+  }
+}
+// Select all employees for meeting
+document.getElementById('btn-select-all-meet').addEventListener('click', () => {
+  const checkboxes = document.querySelectorAll('#employee-list-meet input[type="checkbox"]');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = true;
+    const card = checkbox.closest('.employee-card');
+    updateEmployeeSelection(card, true);
+  });
+});
+// Clear all selections for meeting
+document.getElementById('btn-clear-all-meet').addEventListener('click', () => {
+  const checkboxes = document.querySelectorAll('#employee-list-meet input[type="checkbox"]');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = false;
+    const card = checkbox.closest('.employee-card');
+    updateEmployeeSelection(card, false);
+  });
+});
+document.getElementById('btn-load-emp-meet').addEventListener('click', loadEmployeesForMeeting);
+// Get selected participants
+function getSelectedParticipants() {
+  const checkboxes = document.querySelectorAll('#employee-list-meet input[type="checkbox"]:checked');
+  return Array.from(checkboxes).map(cb => ({
+    EMAIL: cb.dataset.email,
+    NAMA: cb.dataset.name
+  }));
+}
+document.getElementById('btn-add-meet').addEventListener('click', async () => {
+  try {
+    const title = document.getElementById('m-title').value.trim();
+    const dateTime = document.getElementById('m-dt').value;
+    const duration = Number(document.getElementById('m-dur').value || 60);
+    const location = document.getElementById('m-loc').value.trim();
+    const description = document.getElementById('m-desc').value.trim();
+    const participants = getSelectedParticipants();
+    
+    if (!title || !dateTime) {
+      showToast('Please fill in title and date/time', 'error');
+      return;
+    }
+    
+    if (participants.length === 0) {
+      showToast('Please select at least one participant', 'error');
+      return;
+    }
+    
+    await call('addMeeting', { 
+      title, 
+      dateTime, 
+      duration, 
+      location, 
+      description, 
+      participants 
+    });
+    
+    showToast('Meeting created and invitations sent');
+    loadMeetings();
+    
+    // Reset form
+    document.getElementById('m-title').value = '';
+    document.getElementById('m-dt').value = '';
+    document.getElementById('m-dur').value = '60';
+    document.getElementById('m-loc').value = '';
+    document.getElementById('m-desc').value = '';
+    
+    // Clear participant selections
+    const checkboxes = document.querySelectorAll('#employee-list-meet input[type="checkbox"]');
+    checkboxes.forEach(cb => {
+      cb.checked = false;
+      const card = cb.closest('.employee-card');
+      updateEmployeeSelection(card, false);
+    });
+  } catch (error) {
+    showToast(error.message, 'error');
+  }
+});
+async function loadMeetings() {
+  const tbody = document.getElementById('tbl-meet');
+  tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Loading meetings...</td></tr>';
+  
+  try {
+    const rows = await call('listMeetings', {});
+    
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">No meetings found</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = rows.map(meeting => `
+      <tr>
+        <td><strong>${esc(meeting.Title)}</strong></td>
+        <td>${esc(meeting.DateTime)}</td>
+        <td>${esc(meeting.Duration)} min</td>
+        <td>${esc(meeting.Location || '')}</td>
+        <td>
+          <div style="max-height: 60px; overflow-y: auto;">
+            ${esc(meeting.Participants || '').replace(/, /g, '<br>')}
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch (error) {
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-danger">Error: ${error.message}</td></tr>`;
+  }
+}
+document.getElementById('btn-load-meet').addEventListener('click', loadMeetings);
+// ================== Budget ==================
+async function loadApprovedBudgets() {
+    const tbody = document.getElementById('tbl-budget');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="5"><i class="fas fa-spinner fa-spin"></i> Memuat...</td></tr>';
+    try {
+      // Manager otomatis bisa lihat semua
+      const [budgets, expenses] = await Promise.all([
+        call('getBudget', {}),     // { ID, Project, Amount, Period }
+        call('getExpenses', {}),   // { ID, Project, Desc, Date, Amount, OwnerEmail, OwnerNPK }
+      ]);
+      // Agregasi expense per project
+      const usedByProject = {};
+      const expenseDetailByProject = {};
+      (expenses || []).forEach(e => {
+        const key = (e.Project || '-').toString();
+        const amt = Number(e.Amount || 0);
+        usedByProject[key] = (usedByProject[key] || 0) + amt;
+        
+        if (!expenseDetailByProject[key]) {
+          expenseDetailByProject[key] = [];
+        }
+        expenseDetailByProject[key].push({ desc: e.Desc, date: e.Date, amount: amt });
+      });
+      if (!budgets || budgets.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="padding:16px; color:var(--muted)">Belum ada budget (ajukan proyek & setujui terlebih dahulu)</td></tr>';
+        return;
+      }
+      // Render baris tabel
+      tbody.innerHTML = (budgets || []).map(b => {
+        const project = b.Project || '-';
+        const amount  = Number(b.Amount || 0);
+        const period  = b.Period || '';
+        const used    = Number(usedByProject[project] || 0);
+        const remain  = Math.max(amount - used, 0);
+        const expensesForProject = expenseDetailByProject[project] || [];
+        const expenseHtml = expensesForProject.length > 0
+          ? `<ul class="expense-list">${expensesForProject.map(e => `<li><small>${esc(e.date)}</small>: ${esc(e.desc)} - Rp ${fmtRupiah(e.amount)}</li>`).join('')}</ul>`
+          : '<em>Belum ada pengeluaran</em>';
+        return `
+          <tr>
+            <td><strong>${esc(project)}</strong></td>
+            <td>Rp ${fmtRupiah(amount)}</td>
+            <td>${esc(period)}</td>
+            <td>${expenseHtml}</td>
+            <td><strong>Rp ${fmtRupiah(remain)}</strong></td>
+          </tr>
+        `;
+      }).join('');
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="5" style="padding:16px; color:var(--danger)">Gagal memuat budget</td></tr>';
+      showToast(e.message || 'Gagal memuat budget', 'error');
+    }
+}
+document.getElementById('btn-load-budget')?.addEventListener('click', loadApprovedBudgets);
+// ================== Kanban ==================
+// ---- KANBAN: build otomatis dari listReminders ----
+function groupByProjectAverage(reminders){
+  // { PROJECT: { sum, count, latestDeadline, anyAssignee } }
+  const map = {};
+  (reminders||[]).forEach(r=>{
+    const p = (r.PROJECT||'').toString().trim();
+    if(!p) return;
+    const pr = Number(r.PROGRESS||0);
+    if(!map[p]) map[p] = { sum:0, count:0, latestDeadline:null, anyAssignee:null };
+    map[p].sum += pr;
+    map[p].count += 1;
+    // ambil deadline paling dekat yang valid (opsional)
+    const dl = r.DEADLINE ? new Date(r.DEADLINE) : null;
+    if(dl && !isNaN(dl.getTime())){
+      if(!map[p].latestDeadline || dl < map[p].latestDeadline) map[p].latestDeadline = dl;
+    }
+    // simpan salah satu nama/email (opsional)
+    if(!map[p].anyAssignee) map[p].anyAssignee = r.NAMA || r.EMAIL || '';
+  });
+  // konversi ke array
+  return Object.entries(map).map(([project, v])=>{
+    const avg = v.count ? (v.sum / v.count) : 0;
+    return {
+      project,
+      avg: Math.round(avg), // bulatkan biar rapi
+      deadline: v.latestDeadline ? v.latestDeadline.toISOString().slice(0,10) : '-',
+      assignee: v.anyAssignee || ''
+    };
+  });
+}
+function renderKanbanColumns(items){
+  // reset
+  const elTodo = document.getElementById('k-todo');
+  const elDoing= document.getElementById('k-doing');
+  const elDone = document.getElementById('k-done');
+  elTodo.innerHTML = elDoing.innerHTML = elDone.innerHTML = '<div style="padding:12px;color:var(--muted)"><i class="fas fa-spinner fa-spin"></i> Memuat...</div>';
+  // klasifikasi
+  const todo = [], doing = [], done = [];
+  items.forEach(it=>{
+    if(it.PROGRESS<=0) todo.push(it);
+    else if(it.PROGRESS>=100) done.push(it);
+    else doing.push(it);
+  });
+  // helper kartu
+  const card = (x)=>`
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">
+        <strong>${x.PROJECT}</strong>
+        <span style="font-size:12px;color:var(--muted)">${x.PROGRESS}%</span>
+      </div>
+      <div class="progress" style="margin-top:8px">
+        <div class="progress-bar" style="width:${x.PROGRESS}%"></div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">
+        Assignee: ${x.NAMA} · Deadline: ${x.DEADLINE}
+      </div>
+    </div>`;
+  // sort opsional: by deadline asc
+  const byDeadline = arr => arr.sort((a,b)=>(a.DEADLINE>b.DEADLINE?1:-1));
+  elTodo.innerHTML = byDeadline(todo).map(card).join('') || '<div style="padding:8px;color:var(--muted)">Kosong</div>';
+  elDoing.innerHTML= byDeadline(doing).map(card).join('')|| '<div style="padding:8px;color:var(--muted)">Kosong</div>';
+  elDone.innerHTML = byDeadline(done).map(card).join('')  || '<div style="padding:8px;color:var(--muted)">Kosong</div>';
+  // counter
+  document.getElementById('k-todo-count').textContent = todo.length;
+  document.getElementById('k-doing-count').textContent = doing.length;
+  document.getElementById('k-done-count').textContent  = done.length;
+}
+async function loadKanban(){
+  try{
+    const filter = (document.getElementById('kanban-employee')?.value || '').toLowerCase();
+    const items = await call('listReminders', {});
+    
+    const filteredItems = items.filter(it => {
+      const emailOrNpkOrNama = `${it.EMAIL || it.NPK || it.NAMA || ''}`.toLowerCase();
+      return !filter || emailOrNpkOrNama.includes(filter);
+    });
+    renderKanbanColumns(filteredItems);
+  }catch(e){
+    ['k-todo','k-doing','k-done'].forEach(id=>{
+      const box=document.getElementById(id);
+      if(box) box.innerHTML = `<div style="padding:12px;color:var(--danger)">Error: ${e.message}</div>`;
+    });
+  }
+}
+document.getElementById('btn-load-kanban')?.addEventListener('click', loadKanban);
+document.getElementById('kanban-employee')?.addEventListener('change', loadKanban);
+async function loadEmployeesForKanban() {
+  try {
+    const res = await call('listEmployees', {});
+    const sel = document.getElementById('kanban-employee');
+    if (!sel) return;
+    const selected = sel.value || '';
+    sel.innerHTML = '<option value="">— Semua Karyawan (Gabungan) —</option>';
+    (res || []).forEach(emp => {
+      const val = emp?.EMAIL || emp?.NPK || emp?.NAMA;
+      const label = `${emp?.NAMA || '-'}${emp?.EMAIL ? ' ('+emp.EMAIL+')' : ''}`;
+      const opt = document.createElement('option');
+      opt.value = val;
+      opt.textContent = label;
+      sel.appendChild(opt);
+    });
+    if (selected) sel.value = selected;
+  } catch(e){
+    // ignore
+  }
+}
+document.querySelector('[data-section="kanban"]')?.addEventListener('click', () => {
+  setTimeout(async () => { await loadEmployeesForKanban(); await loadKanban(); }, 50);
+});
+// ================== Notes ==================
+document.getElementById('btn-load-notes').addEventListener('click', async () => {
+  try {
+    const data = await call('getNotes', {});
+    document.getElementById('notes-area').value = data.text || '';
+    showToast('Notes loaded successfully');
+  } catch (error) {
+    showToast(error.message, 'error');
+  }
+});
+document.getElementById('btn-save-notes').addEventListener('click', async () => {
+  try {
+    const text = document.getElementById('notes-area').value;
+    await call('saveNotes', { text });
+    showToast('Notes saved successfully');
+  } catch (error) {
+    showToast(error.message, 'error');
+  }
+});
+// ================== Pengajuan ==================
+async function loadPengajuan(){
+  const tbody = document.getElementById('tbl-pengajuan');
+  tbody.innerHTML='<tr><td colspan="6">Loading...</td></tr>';
+  try {
+    const rows = await call('listPengajuan', {});
+    if(!rows.length){
+      tbody.innerHTML='<tr><td colspan="6" style="color:var(--muted)">Belum ada pengajuan</td></tr>';
+      return;
+    }
+    tbody.innerHTML = rows.map(r=>{
+      return `
+        <tr>
+          <td>${esc(r.Judul)}</td>
+          <td>${esc(r.Deskripsi)}</td>
+          <td>Rp ${Number(r.Biaya).toLocaleString('id-ID')}</td>
+          <td>${esc(r.PemohonNama||'-')} ${r.PemohonEmail ? `<small style="color:var(--muted)">(${esc(r.PemohonEmail)})</small>` : ''}</td>
+          <td>${renderStatusPill(r.Status)}</td>
+          <td>
+            <button class="btn btn-sm btn-primary" onclick="setStatus('${esc(r.ID)}','SETUJU')">Setuju</button>
+            <button class="btn btn-sm btn-secondary" onclick="setStatus('${esc(r.ID)}','TOLAK')">Tolak</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } catch(e){
+    showToast(e.message,'error');
+  }
+}
+function renderStatusPill(s) {
+  const up = String(s||'MENUNGGU').toUpperCase();
+  if (up === 'SETUJU') return '<span class="status-pill ok"><span class="status-dot"></span> SETUJU</span>';
+  if (up === 'TOLAK')  return '<span class="status-pill danger"><span class="status-dot"></span> TOLAK</span>';
+  return '<span class="status-pill warn"><span class="status-dot"></span> MENUNGGU</span>';
+}
+async function setStatus(id,status){
+  try {
+    await call('updatePengajuan',{id,status});
+    showToast('Status diperbarui');
+    loadPengajuan();
+  } catch(e){ showToast(e.message, 'error'); }
+}
+document.getElementById('btn-refresh-pengajuan').addEventListener('click', loadPengajuan);
+// Initialize the app
+loadDashboard();
+// Fungsi untuk logout
+function doLogout() {
+  // Hapus data autentikasi dari localStorage
+  localStorage.removeItem('authData');
+  // Arahkan ke halaman login
+  window.location.href = 'login.html';
+}
+// Tambahkan event listener untuk tombol logout
+document.addEventListener("DOMContentLoaded", () => {
+  const logoutBtn = document.getElementById("btn-logout");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", doLogout);
+  }
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", ()=>{
+  requireAuth("manager", ({user})=>{
+    const nameEl = document.getElementById("user-name");
+    if (nameEl && user?.nama) nameEl.textContent = user.nama;
+  });
+  const out = document.getElementById("btn-logout");
+  if (out) out.addEventListener("click", doLogout);
+});
+</script>
+<script>
+// Format Rupiah helper
+function fmtRupiah(num) {
+  return Number(num).toLocaleString('id-ID');
+}
+// Format Date helper
+function fmtDateISO(date) {
+  if (!date) return '';
+  try {
+    return new Date(date).toISOString().slice(0, 10);
+  } catch (e) {
+    return date;
+  }
+}
+</script>
+</body>
+</html>
