@@ -867,6 +867,14 @@
     opacity: 1;
   }
   
+  /* Budget badges for remain */
+  .remain-neg { color: var(--danger); font-weight: 700; }
+  .remain-pos { color: var(--ok); font-weight: 700; }
+  .sop-box { background: #fff; border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .sop-box h4 { margin:0 0 8px 0; font-size:16px; }
+  .sop-box ul { margin:8px 0 0 18px; }
+  .sop-box li { margin:4px 0; }
+
   /* Responsive */
   @media (max-width: 1024px) {
     .sidebar {
@@ -924,7 +932,7 @@
           <i class="fas fa-gem" style="display:none;"></i>
         </div>
         <div class="logo-text">KSN</div>
-        <div class="logo-subtitle">REMINDER KSN</div>
+        <div class="logo-subtitle">MONITORING PROJECT</div>
       </div>
     </div>
     
@@ -1411,39 +1419,18 @@
       <div id="budget" class="page-section">
         <div class="card">
           <div class="card-header">
-            <div>
-              <h3 class="card-title">Project Budget</h3>
-              <p class="card-subtitle">Budget ditarik otomatis dari pengajuan yang disetujui. Tidak ada input manual.</p>
-            </div>
-            <button class="btn btn-secondary btn-sm" id="btn-load-budget">
-              <i class="fas fa-sync-alt"></i> Load Budgets
-            </button>
+            <h3 class="card-title">SOP Budget</h3>
+            <p class="card-subtitle">Aturan perhitungan dan tampilan budget</p>
           </div>
-          
-          <div class="grid grid-cols-12">
-            <div class="col-span-4">
-              <div class="form-group">
-                <label class="form-label">Project Name</label>
-                <input type="text" class="form-control" id="b-project" placeholder="Project name">
-              </div>
-            </div>
-            <div class="col-span-4">
-              <div class="form-group">
-                <label class="form-label">Budget Amount</label>
-                <input type="number" class="form-control" id="b-amount" placeholder="0">
-              </div>
-            </div>
-            <div class="col-span-4">
-              <div class="form-group">
-                <label class="form-label">Period</label>
-                <input type="text" class="form-control" id="b-period" placeholder="e.g., 2023-Q3">
-              </div>
-            </div>
-            <div class="col-span-12">
-              <button class="btn btn-primary" id="btn-add-budget" style="display:none">
-                <i class="fas fa-plus-circle"></i> Add Budget
-              </button>
-            </div>
+          <div class="sop-box">
+            <h4>Ketentuan</h4>
+            <ul>
+              <li><strong>Uang Muka</strong> (budget awal) otomatis ditarik dari <em>pengajuan yang disetujui</em> (tanpa input manual).</li>
+              <li><strong>Penggunaan Uang</strong> dijumlahkan dari tabel <code>expense</code> (per proyek).</li>
+              <li><strong>Sisa Uang</strong> = Uang Muka − Penggunaan Uang.</li>
+              <li>Jika Penggunaan Uang &gt; Uang Muka, maka <strong>Sisa Uang boleh minus</strong> dan ditampilkan <span style="color:var(--danger);font-weight:700;">merah</span>.</li>
+              <li>Semua tanggal ditampilkan sebagai <code>YYYY-MM-DD</code> (tanpa akhiran <code>T...Z</code>).</li>
+            </ul>
           </div>
         </div>
         
@@ -1463,7 +1450,7 @@
               <thead>
                 <tr>
                   <th>Project</th>
-                  <th>Uang Muka</th>
+                  <th>BUDGED</th>
                   <th>Period</th>
                   <th>Penggunaan Uang</th>
                   <th>Sisa Uang</th>
@@ -1587,7 +1574,6 @@
   </div>
 </div>
 
-<!-- Loading Overlay -->
 <div class="loading-overlay" id="loading-overlay">
   <div class="loading-spinner-lg"></div>
 </div>
@@ -2084,7 +2070,7 @@ async function loadReminders() {
         <td><strong>${esc(reminder.NAMA)}</strong></td>
         <td>${esc(reminder.EMAIL)}</td>
         <td>${esc(reminder.PROJECT)}</td>
-        <td>${esc(reminder.DEADLINE)}</td>
+        <td>${esc(fmtDateClean(reminder.DEADLINE))}</td>
         <td>${esc(reminder.PRIORITY)}</td>
         <td>
           <div>${Number(reminder.PROGRESS || 0)}%</div>
@@ -2475,7 +2461,7 @@ async function loadMeetings() {
     tbody.innerHTML = rows.map(meeting => `
       <tr>
         <td><strong>${esc(meeting.Title)}</strong></td>
-        <td>${esc(meeting.DateTime)}</td>
+        <td>${esc(fmtDateClean(meeting.DateTime))}</td>
         <td>${esc(meeting.Duration)} min</td>
         <td>${esc(meeting.Location || '')}</td>
         <td>
@@ -2552,7 +2538,7 @@ async function loadApprovedBudgets() {
         const amount  = Number(b.Amount || 0);
         const period  = b.Period || '';
         const used    = Number(usedByProject[project] || 0);
-        const remain  = Math.max(amount - used, 0);
+        const remain  = (amount - used);
         const expensesForProject = expenseDetailByProject[project] || [];
         const expenseHtml = expensesForProject.length > 0
           ? `<ul class="expense-list">${expensesForProject.map(e => `<li><small>${esc(e.date)}</small>: ${esc(e.desc)} - Rp ${fmtRupiah(e.amount)}</li>`).join('')}</ul>`
@@ -2563,7 +2549,7 @@ async function loadApprovedBudgets() {
             <td>Rp ${fmtRupiah(amount)}</td>
             <td>${esc(period)}</td>
             <td>${expenseHtml}</td>
-            <td><strong>Rp ${fmtRupiah(remain)}</strong></td>
+            <td><span class="${remain < 0 ? 'remain-neg' : 'remain-pos'}">Rp ${fmtRupiah(remain)}</span></td>
           </tr>
         `;
       }).join('');
@@ -2656,11 +2642,18 @@ function renderKanbanColumns(items){
         <div class="progress-bar" style="width:${x.PROGRESS}%"></div>
       </div>
       <div style="font-size:12px;color:var(--muted);margin-top:8px">
-        Assignee: ${x.NAMA} · Deadline: ${x.DEADLINE}
+        Assignee: ${x.NAMA} · Deadline: ${fmtDateClean(x.DEADLINE)}
       </div>
     </div>`;
   // sort opsional: by deadline asc
-  const byDeadline = arr => arr.sort((a,b)=>(a.DEADLINE>b.DEADLINE?1:-1));
+  const byDeadline = arr => arr.sort((a,b)=>{
+  const da = new Date(fmtDateClean(a.DEADLINE));
+  const db = new Date(fmtDateClean(b.DEADLINE));
+  if (isNaN(da) && isNaN(db)) return 0;
+  if (isNaN(da)) return 1;
+  if (isNaN(db)) return -1;
+  return da - db;
+});
   elTodo.innerHTML = byDeadline(todo).map(card).join('') || '<div style="padding:8px;color:var(--muted)">Kosong</div>';
   elDoing.innerHTML= byDeadline(doing).map(card).join('')|| '<div style="padding:8px;color:var(--muted)">Kosong</div>';
   elDone.innerHTML = byDeadline(done).map(card).join('')  || '<div style="padding:8px;color:var(--muted)">Kosong</div>';
@@ -2860,6 +2853,21 @@ document.addEventListener("DOMContentLoaded", ()=>{
 // Format Rupiah helper
 function fmtRupiah(num) {
   return Number(num).toLocaleString('id-ID');
+}
+
+// Bersihkan tanggal ke format YYYY-MM-DD tanpa T...Z
+function fmtDateClean(x){
+  if(!x) return '';
+  const s = String(x);
+  // Jika bentuk ISO: "2025-09-12T17:00:00.000Z" -> "2025-09-12"
+  if (s.includes('T')) return s.split('T')[0];
+  // Jika Date object atau string lain, amankan ke YYYY-MM-DD
+  try {
+    const d = new Date(s);
+    if (!isNaN(d.getTime())) return d.toISOString().slice(0,10);
+  } catch(e){}
+  // fallback: potong 10 char pertama bila tampak seperti 2025-09-12...
+  return s.slice(0,10);
 }
 
 // Format Date helper
