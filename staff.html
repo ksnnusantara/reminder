@@ -610,7 +610,11 @@
         <div class="card">
           <div class="card-header"><h3 class="card-title">Update Progress</h3></div>
           <div class="grid grid-cols-12">
-            <div class="col-span-4"><input class="form-control" id="up-project" placeholder="Nama project (persis seperti di tabel)"></div>
+            <div class="col-span-4">
+              <select class="form-control form-select" id="up-project">
+                <option value="">— Pilih Project Anda —</option>
+              </select>
+            </div>
             <div class="col-span-2"><input type="number" class="form-control" id="up-progress" min="0" max="100" value="0" placeholder="%"></div>
             <div class="col-span-6"><input class="form-control" id="up-link" placeholder="Submission link (https://...)"></div>
             <div class="col-span-12"><input class="form-control" id="up-notes" placeholder="Catatan (opsional)"></div>
@@ -769,11 +773,25 @@ function showToast(message, type='success'){
   box.appendChild(el); setTimeout(()=>el.classList.add('show'),10);
   setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(),300); },3000);
 }
+// === NEW: semua tanggal jadi YYYY-MM-DD (lokal Asia/Jakarta, tanpa geser hari)
+function fmtDateClean(input){
+  if (!input) return '';
+  const s = String(input).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  if (s.includes('T')) {
+    const ymd = s.split('T')[0];
+    if (/^\d{4}-\d{2}-\d{2}$/.test(ymd)) return ymd;
+  }
+  const d = new Date(s);
+  if (isNaN(d)) return s.slice(0,10);
+  const tz = 'Asia/Jakarta';
+  const parts = new Intl.DateTimeFormat('id-ID',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'})
+    .formatToParts(d).reduce((o,p)=>(o[p.type]=p.value,o),{});
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
+// REPLACE fmtDateISO lama
 function fmtDateISO(dStr){
-  if(!dStr) return '-';
-  const d = new Date(dStr);
-  const opts = { day:'2-digit', month:'short', year:'numeric' };
-  return d.toLocaleDateString('id-ID', opts);
+  return fmtDateClean(dStr) || '-';
 }
 function isHOrH1(dStr){
   if(!dStr) return false;
@@ -785,7 +803,10 @@ function isHOrH1(dStr){
   return (only.getTime()===today.getTime()) || (only.getTime()===tomorrow.getTime());
 }
 function fmtRupiah(n){ return Number(n||0).toLocaleString('id-ID'); }
-function fmtTanggal(t){ if(!t) return '-'; return new Date(t).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}); }
+// REPLACE fmtTanggal lama
+function fmtTanggal(t){
+  return fmtDateClean(t) || '-';
+}
 function esc(s){ return (s||'').toString().replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function isManagerRole(role){
   const r = String(role||'').toLowerCase();
@@ -829,6 +850,7 @@ async function loadReminders(){
     if(!rows.length){
       tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding:16px;color:var(--muted)">Tidak ada tugas</td></tr>';
       recomputeDashboard();
+      populateMyProjectSelect();
       return;
     }
     tbody.innerHTML = rows.map(r=>{
@@ -838,7 +860,7 @@ async function loadReminders(){
       return `
         <tr>
           <td><strong>${esc(r.PROJECT)}</strong></td>
-          <td>${fmtDateISO(r.DEADLINE)}</td>
+          <td>${fmtDateClean(r.DEADLINE)}</td>
           <td>${(r.PRIORITY||'-')}</td>
           <td>
             <div>${prog}%</div>
@@ -855,23 +877,35 @@ async function loadReminders(){
     tbody.querySelectorAll('[data-up]').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         const { project } = JSON.parse(decodeURIComponent(btn.getAttribute('data-up')));
-        document.getElementById('up-project').value = project || '';
+        document.getElementById('up-project').value = project || ''; // set dropdown
         const found = __myReminders.find(x=>String(x.PROJECT||'')===String(project||''));
         document.getElementById('up-progress').value = found ? Number(found.PROGRESS||0) : 0;
-        document.getElementById('up-link').value = found ? (found.SUBMISSION_LINK||'') : '';
-        document.getElementById('up-notes').value = found ? (found.NOTES||'') : '';
+        document.getElementById('up-link').value     = found ? (found.SUBMISSION_LINK||'') : '';
+        document.getElementById('up-notes').value    = found ? (found.NOTES||'') : '';
         showToast('Form diisi dari baris terpilih');
       });
     });
     recomputeDashboard();
+    populateMyProjectSelect();
   }catch(e){
     tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding:16px;color:var(--danger)">Error: ${e.message}</td></tr>`;
   }
 }
+// === NEW: isi select #up-project dari daftar tugas milik user
+function populateMyProjectSelect(){
+  const sel = document.getElementById('up-project');
+  if (!sel) return;
+  const list = (__myReminders || [])
+    .map(r => String(r.PROJECT || '').trim())
+    .filter(Boolean);
+  const uniq = Array.from(new Set(list)).sort((a,b)=>a.localeCompare(b,'id-ID'));
+  sel.innerHTML = '<option value="">— Pilih Project Anda —</option>' +
+    uniq.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
+}
 document.getElementById('btn-load-rem').addEventListener('click', loadReminders);
 document.getElementById('btn-update-progress').addEventListener('click', async ()=>{
   try{
-    const project = document.getElementById('up-project').value.trim();
+    const project = document.getElementById('up-project').value;
     const progress = Number(document.getElementById('up-progress').value || 0);
     const notes = document.getElementById('up-notes').value;
     const link = document.getElementById('up-link').value;
