@@ -919,6 +919,27 @@
       grid-template-columns: 1fr;
     }
   }
+
+  /* === badges & counter pills === */
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600}
+  .badge-muted{background:#eef2f6;color:#475569;border:1px solid #e2e8f0}
+  .badge-warn{background:rgba(245,158,11,.1);color:#b45309;border:1px solid #f59e0b}
+  .badge-danger{background:rgba(239,68,68,.08);color:#991b1b;border:1px solid #ef4444}
+  .badge-ok{background:rgba(16,185,129,.1);color:#065f46;border:1px solid #10b981}
+  /* count bubble kecil di header card */
+  .count-bubble{background:#fff;color:#475569;font-size:12px;font-weight:700;min-width:26px;height:26px;border-radius:999px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line)}
+  /* kartu Kanban 'Overdue' beraksen merah di atas */
+  .card.overdue::before{background:linear-gradient(90deg,#ef4444,#f59e0b)}
+  /* table zebra + hover lembut */
+  .table tr:nth-child(even) td{background:#fafbfd}
+  .table tr:hover td{background:#fdfaf3} /* nuansa emas lembut */
+  /* tombol icon-only aksesibel */
+  .btn[aria-label]{position:relative}
+  .btn[aria-label]::after{
+    content: attr(aria-label); position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%);
+    background:#0f172a;color:#fff;padding:4px 8px;border-radius:6px;font-size:11px;white-space:nowrap;opacity:0;pointer-events:none;transition:.2s
+  }
+  .btn[aria-label]:hover::after{opacity:1}
 </style>
 <script src="auth.js"></script>
 </head>
@@ -1010,7 +1031,9 @@
         <span id="page-title-text">Dashboard</span>
       </div>
       <div class="header-actions">
-        <button class="btn btn-icon" id="menu-toggle">
+        <div class="badge badge-muted" id="user-pill" style="margin-right:8px;display:none">
+          <i class="fas fa-user"></i><span id="user-name">User</span></div>
+        <button class="btn btn-icon" id="menu-toggle" aria-label="Buka/Tutup menu">
           <i class="fas fa-bars"></i>
         </button>
         <button class="btn btn-secondary btn-sm" id="btn-logout">
@@ -1473,7 +1496,7 @@
             </button>
           </div>
           <div style="font-size:13px;color:var(--muted);margin-top:-8px;margin-bottom:8px">
-            To Do = 0% · Doing = 1–99% · Done = 100%
+            To Do = 0% · Doing = 1–99% · Done = 100% · **Overdue = Deadline terlewati & progress &lt; 100%**
           </div>
           <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
             <label for="kanban-employee" class="form-label" style="margin:0;">Filter Karyawan</label>
@@ -1486,29 +1509,38 @@
           </div>
         </div>
         <div class="grid grid-cols-12">
-          <div class="col-span-4">
+          <div class="col-span-3">
+            <div class="card overdue">
+              <div class="card-header">
+                <h3 class="card-title">Overdue</h3>
+                <span class="count-bubble" id="k-overdue-count">0</span>
+              </div>
+              <div id="k-overdue"></div>
+            </div>
+          </div>
+          <div class="col-span-3">
             <div class="card">
               <div class="card-header">
                 <h3 class="card-title">To Do</h3>
-                <span id="k-todo-count">0</span>
+                <span class="count-bubble" id="k-todo-count">0</span>
               </div>
               <div id="k-todo"></div>
             </div>
           </div>
-          <div class="col-span-4">
+          <div class="col-span-3">
             <div class="card">
               <div class="card-header">
                 <h3 class="card-title">Doing</h3>
-                <span id="k-doing-count">0</span>
+                <span class="count-bubble" id="k-doing-count">0</span>
               </div>
               <div id="k-doing"></div>
             </div>
           </div>
-          <div class="col-span-4">
+          <div class="col-span-3">
             <div class="card">
               <div class="card-header">
                 <h3 class="card-title">Done</h3>
-                <span id="k-done-count">0</span>
+                <span class="count-bubble" id="k-done-count">0</span>
               </div>
               <div id="k-done"></div>
             </div>
@@ -1902,7 +1934,8 @@ document.getElementById('btn-assign').addEventListener('click', async () => {
   try {
     showLoading();
     const projectName = document.getElementById('as-project').value.trim();
-    const deadline = document.getElementById('as-deadline').value;
+    const deadlineRaw = document.getElementById('as-deadline').value;
+    const deadline = fmtDateClean(deadlineRaw);
     const priority = document.getElementById('as-priority').value;
     
     if (!projectName || !deadline) {
@@ -2052,6 +2085,13 @@ document.getElementById('btn-clear-emp').addEventListener('click', ()=>{
 });
 
 // ================== Reminders ==================
+function renderPriority(p){
+  const v = String(p||'').toLowerCase();
+  if(v==='high')   return '<span class="badge badge-danger"><i class="fas fa-fire"></i> High</span>';
+  if(v==='medium') return '<span class="badge badge-warn"><i class="fas fa-bolt"></i> Medium</span>';
+  return '<span class="badge badge-muted"><i class="fas fa-feather"></i> Low</span>';
+}
+
 async function loadReminders() {
   const tbody = document.getElementById('tbl-rem');
   tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Loading reminders...</td></tr>';
@@ -2071,7 +2111,7 @@ async function loadReminders() {
         <td>${esc(reminder.EMAIL)}</td>
         <td>${esc(reminder.PROJECT)}</td>
         <td>${esc(fmtDateClean(reminder.DEADLINE))}</td>
-        <td>${esc(reminder.PRIORITY)}</td>
+        <td>${renderPriority(reminder.PRIORITY)}</td>
         <td>
           <div>${Number(reminder.PROGRESS || 0)}%</div>
           <div class="progress"><div class="progress-bar" style="width:${Number(reminder.PROGRESS||0)}%"></div></div>
@@ -2461,7 +2501,7 @@ async function loadMeetings() {
     tbody.innerHTML = rows.map(meeting => `
       <tr>
         <td><strong>${esc(meeting.Title)}</strong></td>
-        <td>${esc(fmtDateClean(meeting.DateTime))}</td>
+        <td>${esc(fmtDateTimeLocal(meeting.DateTime))}</td>
         <td>${esc(meeting.Duration)} min</td>
         <td>${esc(meeting.Location || '')}</td>
         <td>
@@ -2541,7 +2581,11 @@ async function loadApprovedBudgets() {
         const remain  = (amount - used);
         const expensesForProject = expenseDetailByProject[project] || [];
         const expenseHtml = expensesForProject.length > 0
-          ? `<ul class="expense-list">${expensesForProject.map(e => `<li><small>${esc(e.date)}</small>: ${esc(e.desc)} - Rp ${fmtRupiah(e.amount)}</li>`).join('')}</ul>`
+          ? `<ul class="expense-list">${
+              expensesForProject.map(e => 
+                `<li><small>${esc(fmtDateClean(e.date))}</small>: ${esc(e.desc)} - Rp ${fmtRupiah(e.amount)}</li>`
+              ).join('')
+            }</ul>`
           : '<em>Belum ada pengeluaran</em>';
         return `
           <tr>
@@ -2587,80 +2631,74 @@ function setupBudgetsSearch() {
 document.getElementById('btn-load-budget')?.addEventListener('click', loadApprovedBudgets);
 
 // ================== Kanban ==================
-// ---- KANBAN: build otomatis dari listReminders ----
-function groupByProjectAverage(reminders){
-  // { PROJECT: { sum, count, latestDeadline, anyAssignee } }
-  const map = {};
-  (reminders||[]).forEach(r=>{
-    const p = (r.PROJECT||'').toString().trim();
-    if(!p) return;
-    const pr = Number(r.PROGRESS||0);
-    if(!map[p]) map[p] = { sum:0, count:0, latestDeadline:null, anyAssignee:null };
-    map[p].sum += pr;
-    map[p].count += 1;
-    // ambil deadline paling dekat yang valid (opsional)
-    const dl = r.DEADLINE ? new Date(r.DEADLINE) : null;
-    if(dl && !isNaN(dl.getTime())){
-      if(!map[p].latestDeadline || dl < map[p].latestDeadline) map[p].latestDeadline = dl;
-    }
-    // simpan salah satu nama/email (opsional)
-    if(!map[p].anyAssignee) map[p].anyAssignee = r.NAMA || r.EMAIL || '';
-  });
-  // konversi ke array
-  return Object.entries(map).map(([project, v])=>{
-    const avg = v.count ? (v.sum / v.count) : 0;
-    return {
-      project,
-      avg: Math.round(avg), // bulatkan biar rapi
-      deadline: v.latestDeadline ? v.latestDeadline.toISOString().slice(0,10) : '-',
-      assignee: v.anyAssignee || ''
-    };
-  });
+// TAMBAH: helper untuk cek overdue
+function isDateBeforeTodayLocal(ymd){
+  if(!ymd) return false;
+  const [y,m,dd] = ymd.split('-').map(n=>parseInt(n,10));
+  if(!y || !m || !dd) return false;
+  const today = new Date();
+  const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const d0 = new Date(y, m-1, dd);
+  return d0 < t0;
+}
+
+// === REPLACE isOverdue lama ===
+function isOverdue(item){
+  const done = Number(item.PROGRESS||0) >= 100;
+  if (done) return false;
+  const ymd = fmtDateClean(item.DEADLINE);
+  return isDateBeforeTodayLocal(ymd);
 }
 
 function renderKanbanColumns(items){
-  // reset
-  const elTodo = document.getElementById('k-todo');
-  const elDoing= document.getElementById('k-doing');
-  const elDone = document.getElementById('k-done');
-  elTodo.innerHTML = elDoing.innerHTML = elDone.innerHTML = '<div style="padding:12px;color:var(--muted)"><i class="fas fa-spinner fa-spin"></i> Memuat...</div>';
-  // klasifikasi
-  const todo = [], doing = [], done = [];
-  items.forEach(it=>{
-    if(it.PROGRESS<=0) todo.push(it);
-    else if(it.PROGRESS>=100) done.push(it);
-    else doing.push(it);
+  const elTodo  = document.getElementById('k-todo');
+  const elDoing = document.getElementById('k-doing');
+  const elDone  = document.getElementById('k-done');
+  const elOver  = document.getElementById('k-overdue');
+  [elTodo,elDoing,elDone,elOver].forEach(el=>{
+    if(el) el.innerHTML = '<div style="padding:12px;color:var(--muted)"><i class="fas fa-spinner fa-spin"></i> Memuat...</div>';
   });
-  // helper kartu
-  const card = (x)=>`
-    <div class="card">
+
+  const overdue=[], todo=[], doing=[], done=[];
+  items.forEach(it=>{
+    const p = Number(it.PROGRESS||0);
+    if (isOverdue(it)) overdue.push(it);
+    else if (p<=0)     todo.push(it);
+    else if (p>=100)   done.push(it);
+    else               doing.push(it);
+  });
+
+  const byDeadline = arr => arr.sort((a,b)=>{
+    const da = new Date(fmtDateClean(a.DEADLINE)), db = new Date(fmtDateClean(b.DEADLINE));
+    if (isNaN(da) && isNaN(db)) return 0; if (isNaN(da)) return 1; if (isNaN(db)) return -1; return da-db;
+  });
+
+  const card = (x, isOver=false)=>`
+    <div class="card${isOver?' overdue':''}">
       <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">
-        <strong>${x.PROJECT}</strong>
-        <span style="font-size:12px;color:var(--muted)">${x.PROGRESS}%</span>
+        <strong>${esc(x.PROJECT)}</strong>
+        ${isOver ? '<span class="badge badge-danger"><i class="fas fa-triangle-exclamation"></i> Overdue</span>' : ''}
       </div>
-      <div class="progress" style="margin-top:8px">
-        <div class="progress-bar" style="width:${x.PROGRESS}%"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+        <div style="font-size:12px;color:var(--muted)">Progress</div>
+        <div style="font-size:12px;color:var(--ink)"><strong>${Number(x.PROGRESS||0)}%</strong></div>
       </div>
-      <div style="font-size:12px;color:var(--muted);margin-top:8px">
-        Assignee: ${x.NAMA} · Deadline: ${fmtDateClean(x.DEADLINE)}
+      <div class="progress" style="margin-top:6px"><div class="progress-bar" style="width:${Number(x.PROGRESS||0)}%"></div></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px;display:flex;gap:10px;flex-wrap:wrap">
+        <span><i class="fas fa-user"></i> ${esc(x.NAMA||'-')}</span>
+        <span><i class="fas fa-calendar"></i> ${esc(fmtDateClean(x.DEADLINE))}</span>
       </div>
     </div>`;
-  // sort opsional: by deadline asc
-  const byDeadline = arr => arr.sort((a,b)=>{
-  const da = new Date(fmtDateClean(a.DEADLINE));
-  const db = new Date(fmtDateClean(b.DEADLINE));
-  if (isNaN(da) && isNaN(db)) return 0;
-  if (isNaN(da)) return 1;
-  if (isNaN(db)) return -1;
-  return da - db;
-});
-  elTodo.innerHTML = byDeadline(todo).map(card).join('') || '<div style="padding:8px;color:var(--muted)">Kosong</div>';
-  elDoing.innerHTML= byDeadline(doing).map(card).join('')|| '<div style="padding:8px;color:var(--muted)">Kosong</div>';
-  elDone.innerHTML = byDeadline(done).map(card).join('')  || '<div style="padding:8px;color:var(--muted)">Kosong</div>';
-  // counter
-  document.getElementById('k-todo-count').textContent = todo.length;
-  document.getElementById('k-doing-count').textContent = doing.length;
-  document.getElementById('k-done-count').textContent  = done.length;
+
+  if (elOver)  elOver.innerHTML  = byDeadline(overdue).map(x=>card(x,true)).join('') || '<div style="padding:8px;color:var(--muted)">Kosong</div>';
+  elTodo.innerHTML  = byDeadline(todo).map(x=>card(x)).join('')  || '<div style="padding:8px;color:var(--muted)">Kosong</div>';
+  elDoing.innerHTML = byDeadline(doing).map(x=>card(x)).join('') || '<div style="padding:8px;color:var(--muted)">Kosong</div>';
+  elDone.innerHTML  = byDeadline(done).map(x=>card(x)).join('')  || '<div style="padding:8px;color:var(--muted)">Kosong</div>';
+
+  document.getElementById('k-overdue-count').textContent = overdue.length;
+  document.getElementById('k-todo-count').textContent    = todo.length;
+  document.getElementById('k-doing-count').textContent   = doing.length;
+  document.getElementById('k-done-count').textContent    = done.length;
 }
 
 async function loadKanban(){
@@ -2826,12 +2864,15 @@ document.getElementById('btn-refresh-pengajuan').addEventListener('click', loadP
 loadDashboard();
 
 // Fungsi untuk logout
+// HAPUS blok ini di index.html
+/*
 function doLogout() {
   // Hapus data autentikasi dari localStorage
   localStorage.removeItem('authData');
   // Arahkan ke halaman login
   window.location.href = 'login.html';
 }
+*/
 
 // Tambahkan event listener untuk tombol logout
 document.addEventListener("DOMContentLoaded", () => {
@@ -2843,8 +2884,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.addEventListener("DOMContentLoaded", ()=>{
   requireAuth("manager", ({user})=>{
+    const pill = document.getElementById("user-pill");
     const nameEl = document.getElementById("user-name");
-    if (nameEl && user?.nama) nameEl.textContent = user.nama;
+    if (nameEl && user?.nama){ nameEl.textContent = user.nama; pill.style.display='inline-flex'; }
   });
   const out = document.getElementById("btn-logout");
   if (out) out.addEventListener("click", doLogout);
@@ -2855,19 +2897,47 @@ function fmtRupiah(num) {
   return Number(num).toLocaleString('id-ID');
 }
 
-// Bersihkan tanggal ke format YYYY-MM-DD tanpa T...Z
-function fmtDateClean(x){
-  if(!x) return '';
-  const s = String(x);
-  // Jika bentuk ISO: "2025-09-12T17:00:00.000Z" -> "2025-09-12"
-  if (s.includes('T')) return s.split('T')[0];
-  // Jika Date object atau string lain, amankan ke YYYY-MM-DD
-  try {
-    const d = new Date(s);
-    if (!isNaN(d.getTime())) return d.toISOString().slice(0,10);
-  } catch(e){}
-  // fallback: potong 10 char pertama bila tampak seperti 2025-09-12...
-  return s.slice(0,10);
+// === REPLACE fungsi lama fmtDateClean ===
+function fmtDateClean(input){
+  // Kembalikan '' jika falsy
+  if (!input) return '';
+  const s = String(input).trim();
+
+  // Jika sudah bentuk YYYY-MM-DD (tanpa T), langsung kembalikan
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+  // Jika ada "T", potong bagian tanggal saja
+  if (s.includes('T')) {
+    // Terkadang '2025-09-12T00:00:00.000Z' -> tetap ambil yyyy-mm-dd mentah agar tidak geser zona
+    const ymd = s.split('T')[0];
+    if (/^\d{4}-\d{2}-\d{2}$/.test(ymd)) return ymd;
+  }
+
+  // Parsing fallback ke Date
+  const d = new Date(s);
+  if (isNaN(d)) return s.slice(0,10);
+
+  // Format lokal Asia/Jakarta jadi YYYY-MM-DD TANPA geser timezone
+  const tz = 'Asia/Jakarta';
+  const parts = new Intl.DateTimeFormat('id-ID', { timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit' })
+                .formatToParts(d)
+                .reduce((o,p)=> (o[p.type]=p.value, o), {});
+  // id-ID kasih dd/mm/yyyy -> susun ulang ke yyyy-mm-dd
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
+
+// === NEW: format tanggal & jam lokal: "YYYY-MM-DD HH:MM"
+function fmtDateTimeLocal(input){
+  if (!input) return '';
+  const s = String(input).trim();
+  const d = new Date(s);
+  if (isNaN(d)) return fmtDateClean(s);
+
+  const tz = 'Asia/Jakarta';
+  const dd = fmtDateClean(d); // sudah YYYY-MM-DD
+  const hh = new Intl.DateTimeFormat('id-ID', { timeZone: tz, hour:'2-digit', minute:'2-digit', hour12:false })
+              .format(d);
+  return `${dd} ${hh}`;
 }
 
 // Format Date helper
